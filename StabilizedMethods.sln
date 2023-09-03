@@ -11,7 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StabilizedMethods", "Stabil
 EndProject
 Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "Fortran", "Fortran\Fortran.vfproj", "{966B1F21-4539-4638-B5B6-11FEF04C458A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "С", "C\С.vcxproj", "{8D3609CF-0AF7-47B9-82C1-4A5DFBA24A4F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C", "C\C.vcxproj", "{8D3609CF-0AF7-47B9-82C1-4A5DFBA24A4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
