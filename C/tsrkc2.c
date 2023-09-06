@@ -168,7 +168,7 @@ double tsrkcstep(const unsigned n,
 		{
 			y2[j] = temp1 * y2[j] + temp2 * yjm1[j] + temp3 * yjm2[j];
 		}
-
+		
 		yswap = yjm2;
 		yjm2 = yjm1;
 		yjm1 = y2;
@@ -222,7 +222,7 @@ int tsrkccore(const unsigned n,
 	const double* atol, const double* rtol,
 	const double uround, unsigned iwork[12])
 {
-	double facmax = 5, xold = 0, hp = 0, err = 0;
+	double facmax = 5, xold = x1, hp = x1 - x0, err = 0;
 	double errp = 0, hnew, fac, facp, eigmax;
 	unsigned nrej = 0, mdeg, mdego = 0, nrho = 0;
 	const double tsw = 1.1, acosht = acosh(1.1);
@@ -272,7 +272,7 @@ int tsrkccore(const unsigned n,
 
 				if (eigmax > iwork[10])
 				{
-					iwork[10] = (int)(eigmax + 0.5);
+					iwork[10] = (unsigned)(eigmax + 0.5);
 				}
 				if (iwork[5] == 0)
 				{
@@ -280,7 +280,7 @@ int tsrkccore(const unsigned n,
 				}
 				if (eigmax < iwork[11])
 				{
-					iwork[11] = (int)(eigmax + 0.5);
+					iwork[11] = (unsigned)(eigmax + 0.5);
 				}
 			}
 		}

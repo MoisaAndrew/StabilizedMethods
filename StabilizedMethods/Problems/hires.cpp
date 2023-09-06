@@ -26,7 +26,7 @@ void get_hires(
 
     *fcn = fhires;
 
-    *x = 0.0; *xend = 321.8122;
+    *x = 0.0; *xend = 421.8122;
 
     *h = 1e-5;
     
