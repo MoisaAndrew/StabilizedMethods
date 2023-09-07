@@ -1,71 +1,71 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Исходные файлы">
+    <Filter Include="Source files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Файлы заголовков">
+    <Filter Include="Source files\Problems">
+      <UniqueIdentifier>{57f9e01c-28be-4eb6-902b-809110a5b438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Исходные файлы\Problems">
-      <UniqueIdentifier>{57f9e01c-28be-4eb6-902b-809110a5b438}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="utils.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="StabilizedMethods.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="methods_common.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="Problems\bruss.cpp">
-      <Filter>Исходные файлы\Problems</Filter>
+      <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\bruss2d.cpp">
-      <Filter>Исходные файлы\Problems</Filter>
+      <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\burgers.cpp">
-      <Filter>Исходные файлы\Problems</Filter>
+      <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\comb.cpp">
-      <Filter>Исходные файлы\Problems</Filter>
+      <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\cusp.cpp">
-      <Filter>Исходные файлы\Problems</Filter>
+      <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\finag.cpp">
-      <Filter>Исходные файлы\Problems</Filter>
+      <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\hires.cpp">
-      <Filter>Исходные файлы\Problems</Filter>
+      <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\problems_common.cpp">
-      <Filter>Исходные файлы\Problems</Filter>
+      <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\rober.cpp">
-      <Filter>Исходные файлы\Problems</Filter>
+      <Filter>Source files\Problems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fortran.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="problems.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="utils.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="methods_common.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="c.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
