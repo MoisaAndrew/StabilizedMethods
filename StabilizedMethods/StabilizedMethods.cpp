@@ -125,6 +125,7 @@ int main()
 
     double rtol, atol;
 
+    // problem to test
     get_hires(&n, &fcn, &x0, &h0, &xend, &y0);
 
     double* work = (double*)malloc(8 * n * sizeof(double));
@@ -150,11 +151,15 @@ int main()
         printf("maxspr= %i minspr= %i\n\n", iwork[10], iwork[11]);
     }
     
-
+    // tol_max = 10 ^ fromtolp
     const double fromtolp = -2.0;
+    // tol_min = 10 ^ totolp
     const double totolp = -12.0;
+    // tol = 10 ^ (fromtolp - i * tolpstep)
     const double tolpstep = 0.5;
+    // print stats like number of function evaluations, number of steps, ...
     const bool printstats = false;
+    // print work/precision report
     const bool printreport = true;
     const unsigned reportlength = (unsigned)(1.5 + (fromtolp - totolp) / tolpstep);
     double* report[2];
@@ -165,6 +170,10 @@ int main()
     }
 
     
+    // Testing of different methods in a row at one start can lead to a large spread of results.
+    // For more accurate time measurements, it is recommended to comment all methods except one.
+    // Do not forget to test the speed of methods in Release configuration only.
+
     printf("\n-----------------------------------------rock4f-----------------------------------------\n");
 
     iwork[0] = 0; iwork[1] = 0; iwork[2] = 0; iwork[3] = 0;
