@@ -17,7 +17,9 @@ enum MethodName
     ROCK2_C,
     RKC_F,
     RKC_C,
-    TSRKC2
+    DUMKA3,
+    TSRKC2,
+    TSRKC3
 };
 
 
@@ -27,7 +29,7 @@ void run_method_test(
     const double x0, const double xend, double* yp, double* y0, double* y, const double h0,
     const FcnEqDiff fcn, const double* modelsolution,
     double* work, unsigned iwork[12], double* report[2],
-    bool printstats, bool printreport, unsigned reportlength)
+    const bool printstats, const bool printreport, const unsigned reportlength)
 {
     using namespace std::chrono;
 
@@ -67,8 +69,15 @@ void run_method_test(
         case RKC_C:
             idid = rkcc(n, x, xend, y, fcn, rho_dummy, solout_h, &atol, rtol, iwork);
             break;
+        case DUMKA3:
+            idid = dumka3(n, &x, xend, h, atol, rtol, fcn, rho_dummy, 
+                y, &(work[0]), &(work[n]), &(work[2 * n]), &(work[3 * n]), &(work[4 * n]), iwork);
+            break;
         case TSRKC2:
             idid = tsrkc2(n, x, x, xend, &h, yp, y, fcn, rho_dummy, solout_h, &atol, &rtol, iwork);
+            break;
+        case TSRKC3:
+            idid = tsrkc3(n, x, x, xend, &h, yp, y, fcn, rho_dummy, solout_h, &atol, &rtol, iwork);
             break;
         }
         
@@ -82,8 +91,8 @@ void run_method_test(
             if (printstats)
             {
                 printf("atol = %1.2e, rtol = %1.2e\n", atol, rtol);
-                printf("fcn= %i step= %i accpt= %i rejct= %i fspr= %i stg= %i maxspr= %i minspr= %i\n",
-                    iwork[4], iwork[5], iwork[6], iwork[7], iwork[8], iwork[9], iwork[10], iwork[11]);
+                printf("fcn= %i step= %i accpt= %i rejct= %i fspr= %i stg= %i\n",
+                    iwork[4], iwork[5], iwork[6], iwork[7], iwork[8], iwork[9]);
 
                 if (modelsolution != NULL)
                 {
@@ -92,7 +101,7 @@ void run_method_test(
 
                 printf(", time= %.3f ms\n\n", time_span);
             }
-            if (printreport)
+            if (printreport && modelsolution != NULL)
             {
                 report[0][i] = get_absolute_error(n, modelsolution, y);
                 report[1][i] = time_span;
@@ -101,7 +110,7 @@ void run_method_test(
         }
         else
         {
-            if (printreport)
+            if (printreport && modelsolution != NULL)
             {
                 report[0][i] = -1;
                 report[1][i] = time_span;
@@ -109,7 +118,7 @@ void run_method_test(
             }
         }
     }
-    if (printreport)
+    if (printreport && modelsolution != NULL)
     {
         print_report(reportlength, report);
     }
@@ -126,7 +135,7 @@ int main()
     double rtol, atol;
 
     // problem to test
-    get_hires(&n, &fcn, &x0, &h0, &xend, &y0);
+    get_heat(&n, &fcn, &x0, &h0, &xend, &y0);
 
     double* work = (double*)malloc(8 * n * sizeof(double));
     unsigned iwork[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -136,11 +145,11 @@ int main()
     x = x0;
     h = h0;
     y = (double*)malloc(n * sizeof(double));
-    memcpy(y, y0, n * sizeof(double));
     yp = (double*)malloc(n * sizeof(double));
-
+    memcpy(y, y0, n * sizeof(double));
+    memcpy(yp, y0, n * sizeof(double));
+    
     rtol = 2.0e-15, atol = 2.0e-15;
-
     ROCK4F(&n, &x, &xend, &h, y, fcn, rho_dummy, &atol, &rtol, work, iwork, &idid);
 
     if (idid == 1)
@@ -152,11 +161,11 @@ int main()
     }
     
     // tol_max = 10 ^ fromtolp
-    const double fromtolp = -2.0;
+    const double fromtolp = -1.0;
     // tol_min = 10 ^ totolp
-    const double totolp = -12.0;
+    const double totolp = -13.0;
     // tol = 10 ^ (fromtolp - i * tolpstep)
-    const double tolpstep = 0.5;
+    const double tolpstep = 1.0;
     // print stats like number of function evaluations, number of steps, ...
     const bool printstats = false;
     // print work/precision report
@@ -171,22 +180,22 @@ int main()
 
     
     // Testing of different methods in a row at one start can lead to a large spread of results.
-    // For more accurate time measurements, it is recommended to comment all methods except one.
-    // Do not forget to test the speed of methods in Release configuration only.
-
+    // For more accurate time measurements, it is recommended to comment all the methods except one.
+    // Do not forget to test speed of the methods in Release configuration only.
+    
     printf("\n-----------------------------------------rock4f-----------------------------------------\n");
 
     iwork[0] = 0; iwork[1] = 0; iwork[2] = 0; iwork[3] = 0;
     run_method_test(n, ROCK4_F, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn, 
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
-    
+    /*
     printf("\n-----------------------------------------rock2f-----------------------------------------\n");
 
     iwork[0] = 0; iwork[1] = 0; iwork[2] = 0; iwork[3] = 0;
     run_method_test(n, ROCK2_F, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
-    
+    */
     
     printf("\n-----------------------------------------rock2c-----------------------------------------\n");
     
@@ -194,25 +203,39 @@ int main()
     run_method_test(n, ROCK2_C, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
-    
+    /*
     printf("\n------------------------------------------rkcf------------------------------------------\n");
 
     iwork[0] = 1; iwork[1] = 0; iwork[2] = 0; iwork[3] = 0;
     run_method_test(n, RKC_F, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
-    
+
     printf("\n------------------------------------------rkcc------------------------------------------\n");
 
     iwork[0] = 1; iwork[1] = 0; iwork[2] = 0; iwork[3] = 0;
     run_method_test(n, RKC_C, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    */
+    
+    printf("\n-----------------------------------------dumka3-----------------------------------------\n");
+
+    iwork[0] = 0; iwork[1] = 0; iwork[2] = 0; iwork[3] = 0;
+    run_method_test(n, DUMKA3, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn,
+        modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
     
     printf("\n-----------------------------------------tsrkc2-----------------------------------------\n");
-
+    
     iwork[0] = 0; iwork[1] = 0; iwork[2] = 0; iwork[3] = 0;
     run_method_test(n, TSRKC2, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn,
+        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    
+    
+    printf("\n-----------------------------------------tsrkc3-----------------------------------------\n");
+    
+    iwork[0] = 0; iwork[1] = 0; iwork[2] = 0; iwork[3] = 0;
+    run_method_test(n, TSRKC3, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
 

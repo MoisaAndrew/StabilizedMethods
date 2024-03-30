@@ -35,7 +35,7 @@ void get_heat(
 
     *x = 0.0; *xend = 1.0;
 
-    *h = 1 / 20.;//1e-5;
+    *h = 1e-5; //1 / 20.;
 
     *y = (double*)malloc(*n * sizeof(double));
     for (unsigned i = 0; i < *n; i++)

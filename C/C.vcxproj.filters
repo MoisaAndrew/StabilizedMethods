@@ -20,6 +20,12 @@
     <ClCompile Include="tsrkc2.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tsrkc3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dumka3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="rkc.h">
@@ -32,6 +38,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="methods_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tsrkc3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dumka3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
