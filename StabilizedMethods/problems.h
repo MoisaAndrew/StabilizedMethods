@@ -21,5 +21,7 @@ void get_hires(unsigned* n, FcnEqDiff* fcn, double* x, double* h, double* xend, 
 
 void get_rober(unsigned* n, FcnEqDiff* fcn, double* x, double* h, double* xend, double** y);
 
+void get_heat(unsigned* n, FcnEqDiff* fcn, double* x, double* h, double* xend, double** y);
+
 
 void rho_dummy(const unsigned* n, const double* x, const double* y, double* eigmax);

@@ -1,13 +1,13 @@
 //	Author : A.Moisa
 //		e - mail : andrey.moysa@gmail.com
 //
-//	Version of September 2023
+//	Version of April 2023
 
 
 #include "tsrkc2.h"
 
 
-int tsrkctrho(const unsigned n, const double x,
+int tsrkc2trho(const unsigned n, const double x,
 	const double* yn, const double* fn,
 	const double uround,
 	const FcnEqDiff f,
@@ -138,18 +138,18 @@ double tsrkcstep(const unsigned n,
 	const double x0, const double x1, const double h, 
 	const double* y0, const double* y1, const double* f1, 
 	const double* atol, const double* rtol, const int ntol, 
-	const double mdeg,
+	const unsigned mdeg,
 	const double w, const double beta, const double gamma, const double gammaemb, const double acosht,
 	const FcnEqDiff f, 
 	double* y2, double* yjm1, double* yjm2)
 {
 	double* yswap;
 	double *res = y2;
-	const double s = (double)mdeg, hbetads2 = h * beta / (s * s);
+	const double s = (double)mdeg, hbeta = h * beta;
 	const double acoshtds = acosht / s;
 	const double onemgamma = 1 - gamma, onemgammaemb = 1 - gammaemb;
 	double coshims, coshi = cosh(acoshtds), tim1wdtiw;
-	double temp1 = hbetads2 / w, temp2, temp3;
+	double temp1 = hbeta / w, temp2, temp3;
 	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
 	double err = 0;
 	unsigned i, j;
@@ -165,7 +165,7 @@ double tsrkcstep(const unsigned n,
 		coshims = coshi;
 		coshi = cosh(i * acoshtds);
 		tim1wdtiw = coshims / coshi;
-		temp1 = 2 * hbetads2 * tim1wdtiw;
+		temp1 = 2 * hbeta * tim1wdtiw;
 		temp2 = 2 * w * tim1wdtiw;
 		temp3 = 1 - temp2;
 		f(&n, &ci1, yjm1, y2);
@@ -220,7 +220,7 @@ double tsrkcstep(const unsigned n,
 }
 
 
-int tsrkccore(const unsigned n,
+int tsrkc2core(const unsigned n,
 	double x0, double x1, const double xend,
 	double* h,
 	double* y0, double* y1,
@@ -273,7 +273,7 @@ int tsrkccore(const unsigned n,
 				}
 				else
 				{
-					idid = tsrkctrho(n, x1, y1, f1, uround, f, eigvec, yjm1, yjm2, &eigmax, iwork);
+					idid = tsrkc2trho(n, x1, y1, f1, uround, f, eigvec, yjm1, yjm2, &eigmax, iwork);
 				}
 
 				if (eigmax > iwork[10])
@@ -315,11 +315,11 @@ int tsrkccore(const unsigned n,
 			dtsm1w = sm1 * sinh(sm1ds * acosht) / sqrt(w2m1);
 		}
 
-		beta = s2 * (onemq * dtsw + sqrt(pow(onemq * dtsw, 2) + 4 * q * tsw * d2tsw)) / (2 * d2tsw);
-		alpha = s2 * (1 + q) / (q * s2 * tsw + beta * dtsw);
+		beta = (onemq * dtsw + sqrt(pow(onemq * dtsw, 2) + 4 * q * tsw * d2tsw)) / (2 * d2tsw);
+		alpha = (1 + q) / (q * tsw + beta * dtsw);
 		gamma = 1 - alpha * tsw;
 
-		alphaemb = s2 * (1 + q) / (q * s2 * tsm1w + beta * dtsm1w);
+		alphaemb = (1 + q) / (q * tsm1w + beta * dtsm1w);
 		gammaemb = 1 - alphaemb * tsm1w;
 
 		if (mdeg > iwork[9])
@@ -332,7 +332,7 @@ int tsrkccore(const unsigned n,
 		mdego = mdeg;
 		iwork[5]++;
 		iwork[4] += mdeg - 1;
-
+		
 		if (isfinited(err))
 		{
 			fac = sqrt(1 / err);
@@ -536,5 +536,5 @@ int tsrkc2(const unsigned n,
 	iwork[4] = 0, iwork[5] = 0, iwork[6] = 0, iwork[7] = 0,
 	iwork[8] = 0, iwork[9] = 0, iwork[10] = 0, iwork[11] = 0;
 
-	return tsrkccore(n, x0, x1, xend, h, y0, y1, f, rho, solout, atol, rtol, uround, iwork);
+	return tsrkc2core(n, x0, x1, xend, h, y0, y1, f, rho, solout, atol, rtol, uround, iwork);
 }

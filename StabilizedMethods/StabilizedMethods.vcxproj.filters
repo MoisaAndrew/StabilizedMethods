@@ -50,6 +50,9 @@
     <ClCompile Include="Problems\rober.cpp">
       <Filter>Source files\Problems</Filter>
     </ClCompile>
+    <ClCompile Include="Problems\heat.cpp">
+      <Filter>Source files\Problems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fortran.h">
