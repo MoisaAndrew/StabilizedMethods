@@ -1,7 +1,7 @@
 //	Author : A.Moisa
 //		e - mail : andrey.moysa@gmail.com
 //
-//	Version of April 2023
+//	Version of June 2024
 
 
 #include "tsrkc3.h"
@@ -134,22 +134,21 @@ int tsrkc3trho(const unsigned n, const double x,
 }
 
 
-double tsrkc2step(const unsigned n, 
-	const double x0, const double x1, const double h, 
-	const double* y0, const double* y1, const double* f1, 
-	const double* atol, const double* rtol, const int ntol, 
+double tsrkc2step(const unsigned n,
+	const double x0, const double x1, const double h,
+	const double* y0, const double* y1, const double* f1,
 	const unsigned mdeg,
-	const double w, const double beta, const double gamma, const double gammaemb, const double acosht,
-	const FcnEqDiff f, 
+	const double w, const double beta, const double gamma, const double acosht,
+	const FcnEqDiff f,
 	double* y2, double* yjm1, double* yjm2)
 {
 	double* yswap;
-	double *res = y2;
-	const double s = (double)mdeg, hbetads2 = h * beta / (s * s);
-	const double acoshtds = acosht / s;
-	const double onemgamma = 1 - gamma, onemgammaemb = 1 - gammaemb;
+	double* res = y2;
+	const double hbeta = h * beta;
+	const double acoshtds = acosht / mdeg;
+	const double onemgamma = 1 - gamma;
 	double coshims = 1, coshi = w, tim1wdtiw;
-	double temp1 = hbetads2 / w, temp2, temp3;
+	double temp1 = hbeta / w, temp2, temp3;
 	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
 	double err = 0;
 	unsigned i, j;
@@ -165,7 +164,7 @@ double tsrkc2step(const unsigned n,
 		coshims = coshi;
 		coshi = cosh(i * acoshtds);
 		tim1wdtiw = coshims / coshi;
-		temp1 = 2 * hbetads2 * tim1wdtiw;
+		temp1 = 2 * hbeta * tim1wdtiw;
 		temp2 = 2 * w * tim1wdtiw;
 		temp3 = 1 - temp2;
 		f(&n, &ci1, yjm1, y2);
@@ -174,7 +173,7 @@ double tsrkc2step(const unsigned n,
 		{
 			y2[j] = temp1 * y2[j] + temp2 * yjm1[j] + temp3 * yjm2[j];
 		}
-		
+
 		yswap = yjm2;
 		yjm2 = yjm1;
 		yjm1 = y2;
@@ -186,51 +185,22 @@ double tsrkc2step(const unsigned n,
 
 	for (j = 0; j < n; j++)
 	{
-		y2[j] = gamma * y0[j] + onemgamma * yjm1[j];
-		yjm1[j] = gammaemb * y0[j] + onemgammaemb * yjm2[j];
+		res[j] = gamma * y0[j] + onemgamma * yjm1[j];
 	}
-
-	if (ntol == 0)
-	{
-		for (j = 0; j < n; j++)
-		{
-			temp3 = y2[j] - yjm1[j];
-			ci1 = fmax(fabs(y1[j]), fabs(y2[j])) * (*rtol);
-			err += pow(temp3 / (*atol + ci1), 2);
-		}
-	}
-	else
-	{
-		for (j = 0; j < n; j++)
-		{
-			temp3 = y2[j] - yjm1[j];
-			ci1 = fmax(fabs(y1[j]), fabs(y2[j])) * rtol[j];
-			err += pow(temp3 / (atol[j] + ci1), 2);
-		}
-	}
-
-	err = sqrt(err / n);
-
-	if (res != y2)
-	{
-		memcpy(res, y2, n * sizeof(double));
-	}
-
-	return (0.11399435157357929 * s + 0.02397234947266258) * err;
 }
 
 
 double calcchi(const double tsw, const unsigned mdeg, const double q,
-	const double w, const double acosht, 
+	const double w, const double acosht,
 	const double beta, const double delta, const double gamma)
 {
 	const double acoshtds = acosht / mdeg, sinhacoshtds = sinh(acoshtds);
 	double coshims = 1, coshi = w, tim1wdtiw;
 
 	double sumbc2 = 0, ci3 = 0, ci2 = beta / w, ci1, m;
-	
+
 	double b = sinh((mdeg - 1) * acoshtds) * w / sinhacoshtds;
-	
+
 	sumbc2 += b * ci2 * ci2;
 
 	for (unsigned i = 2; i < mdeg; i++)
@@ -239,7 +209,7 @@ double calcchi(const double tsw, const unsigned mdeg, const double q,
 		coshi = cosh(i * acoshtds);
 		tim1wdtiw = coshims / coshi;
 		m = 2 * w * tim1wdtiw;
-		
+
 		ci1 = m * ci2 + (1 - m) * ci3 + 2 * beta * tim1wdtiw;
 		b = sinh((mdeg - i) * acoshtds) * coshi / sinhacoshtds;
 
@@ -255,28 +225,23 @@ double calcchi(const double tsw, const unsigned mdeg, const double q,
 }
 
 
-double tsrkc3step(const unsigned n,
+void tsrkc3step(const unsigned n,
 	const double x0, const double x1, const double h,
 	const double* y0, const double* y1, const double* f1,
-	const double* atol, const double* rtol, const int ntol,
-	const double tsw, const unsigned mdeg,
-	const double w, const double acosht, 
-	const double beta, const double delta, 
+	const unsigned mdeg,
+	const double w, const double acosht,
+	const double beta, const double delta,
 	const double gamma, const double chi,
-	const double deltaemb, const double gammaemb,
 	const FcnEqDiff f,
 	double* y2, double* yjm1, double* yjm2)
 {
 	double* yswap;
 	double* res = y2;
-	const double s = (double)mdeg;
-	const double hbeta = h * beta, acoshtds = acosht / s;
+	const double hbeta = h * beta, acoshtds = acosht / mdeg;
 	const double onemdmgdchi = (1 - delta - gamma) / chi, chim1 = chi - 1;
-	const double onemdmgdchiemb = (1 - deltaemb - gammaemb) / chi;
 	double coshims = 1, coshi = w, tim1wdtiw;
 	double temp1 = chi * hbeta / w, temp2, temp3;
 	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
-	double err = 0;
 	unsigned i, j;
 
 	memcpy(yjm2, y1, n * sizeof(double));
@@ -311,37 +276,8 @@ double tsrkc3step(const unsigned n,
 
 	for (j = 0; j < n; j++)
 	{
-		y2[j] = (1 - gamma - onemdmgdchi) * y1[j] + gamma * y0[j] + onemdmgdchi * yjm1[j];
-		yjm1[j] = (1 - gammaemb - onemdmgdchiemb) * y1[j] + gammaemb * y0[j] + onemdmgdchiemb * yjm2[j];
+		res[j] = (1 - gamma - onemdmgdchi) * y1[j] + gamma * y0[j] + onemdmgdchi * yjm1[j];
 	}
-	
-	if (ntol == 0)
-	{
-		for (j = 0; j < n; j++)
-		{
-			temp3 = y2[j] - yjm1[j];
-			ci1 = fmax(fabs(y1[j]), fabs(y2[j])) * (*rtol);
-			err += pow(temp3 / (*atol + ci1), 2);
-		}
-	}
-	else
-	{
-		for (j = 0; j < n; j++)
-		{
-			temp3 = y2[j] - yjm1[j];
-			ci1 = fmax(fabs(y1[j]), fabs(y2[j])) * rtol[j];
-			err += pow(temp3 / (atol[j] + ci1), 2);
-		}
-	}
-
-	err = sqrt(err / n);
-	
-	if (res != y2)
-	{
-		memcpy(res, y2, n * sizeof(double));
-	}
-
-	return (0.18064082668641275 * s - 0.009352183078548906) * err;
 }
 
 
@@ -357,18 +293,21 @@ int tsrkc3core(const unsigned n,
 	double errp = 0, hnew, fac, facp, eigmax;
 	unsigned nrej = 0, mdeg, mdego = 0, nrho = 0;
 	double tsw = 1.25, acosht = acosh(tsw);
-	double s, s2, sp, spds, s2dls;
-	double w, w2, w2m1, dtsw, d2tsw, d3tsw, tspw, dtspw, d2tspw;
-	double q, onemq;
-	double beta, alpha, delta, gamma, chi, deltaemb, alphaemb, gammaemb;
+	double s, s2, s2dls;
+	double w, w2, w2m1, dtsw, d2tsw, d3tsw;
+	double q, onemq, onepq, onepq2;
+	double beta, alpha, delta, gamma, chi;
 	bool last = false, reject = false;
 	double* y2 = (double*)malloc(n * sizeof(double));
-	double* yswap;
-	double *res[3] = { y0, y1, y2 };
+	double* swap;
+	double* res[3] = { y0, y1, y2 };
 	double* f1 = (double*)malloc(n * sizeof(double));
+	double* f2 = (double*)malloc(n * sizeof(double));
 	double* yjm1 = (double*)malloc(n * sizeof(double));
 	double* yjm2 = (double*)malloc(n * sizeof(double));
 	double* eigvec = (double*)malloc(n * sizeof(double));
+	unsigned j;
+	double temp1, temp2;
 	int idid = 1;
 
 	f(&n, &x1, y1, f1);
@@ -381,7 +320,7 @@ int tsrkc3core(const unsigned n,
 			*h = fabs(xend - x1);
 			last = true;
 		}
-		if (*h < 10 * uround)
+		if (x1 + *h <= x1)
 		{
 			printf("stepsize becomes too small\n");
 			idid = -2;
@@ -418,6 +357,7 @@ int tsrkc3core(const unsigned n,
 
 		q = hp / *h;
 		onemq = 1 - q;
+		onepq = 1 + q;
 
 		if (q < 0.45)
 		{
@@ -437,26 +377,46 @@ int tsrkc3core(const unsigned n,
 			dtsw = s * sinh(acosht) / sqrt(w2m1);
 			d2tsw = (s2 * tsw - w * dtsw) / w2m1;
 
-			sp = s - 1;
-			spds = sp / s;
-			tspw = cosh(spds * acosht);
-			dtspw = sp * sinh(spds * acosht) / sqrt(w2m1);
-
-			beta = s2 * (onemq * dtsw + sqrt(pow(onemq * dtsw, 2) + 4 * q * tsw * d2tsw)) / (2 * d2tsw);
-			alpha = s2 * (1 + q) / (q * s2 * tsw + beta * dtsw);
+			beta = (onemq * dtsw + sqrt(pow(onemq * dtsw, 2) + 4 * q * tsw * d2tsw)) / (2 * d2tsw);
+			alpha = (1 + q) / (q * tsw + beta * dtsw);
 			gamma = 1 - alpha * tsw;
 
-			alphaemb = s2 * (1 + q) / (q * s2 * tspw + beta * dtspw);
-			gammaemb = 1 - alphaemb * tspw;
+			tsrkc2step(n, x0, x1, *h, y0, y1, f1, mdeg, w, beta, gamma, acosht, f, y2, yjm1, yjm2);
 
-			err = tsrkc2step(n, x0, x1, *h, y0, y1, f1, atol, rtol, iwork[3],
-				mdeg, w, beta, gamma, gammaemb, acosht, f, y2, yjm1, yjm2);
+			temp2 = x1 + *h;
+			f(&n, &temp2, y2, f2);
+
+			err = 0;
+			if (iwork[3] == 0)
+			{
+				for (j = 0; j < n; j++)
+				{
+					temp1 = 2 * (y1[j] - y2[j]) + *h * (f1[j] + f2[j]);
+					temp2 = fmax(fabs(y1[j]), fabs(y2[j])) * (*rtol);
+					err += pow(temp1 / (*atol + temp2), 2);
+				}
+			}
+			else
+			{
+				for (j = 0; j < n; j++)
+				{
+					temp1 = 2 * (y1[j] - y2[j]) + *h * (f1[j] + f2[j]);
+					temp2 = fmax(fabs(y1[j]), fabs(y2[j])) * rtol[j];
+					err += pow(temp1 / (atol[j] + temp2), 2);
+				}
+			}
+
+			err = sqrt(err / n);
+			err *= 0.4;
+
 			mdego = 0;
 
 			tsw = 1.25, acosht = acosh(tsw);
 		}
 		else
 		{
+			onepq2 = onepq * onepq;
+
 			s2dls = 1.267029788142009 * (onemq + sqrt(1 + q * (0.44256220745562963 + q)));
 			mdeg = 1 + sqrt((*h * eigmax) * s2dls);
 			if (mdeg < 3)
@@ -473,22 +433,12 @@ int tsrkc3core(const unsigned n,
 				dtsw = s * sinh(acosht) / sqrt(w2m1);
 				d2tsw = (s2 * tsw - w * dtsw) / w2m1;
 				d3tsw = ((1 + 2 * w2 + s2 * w2m1) * dtsw - 3 * s2 * w * tsw) / (w2m1 * w2m1);
-
-				sp = s - 1;
-				spds = sp / s;
-				tspw = cosh(spds * acosht);
-				dtspw = sp * sinh(spds * acosht) / sqrt(w2m1);
-				d2tspw = (sp * sp * tspw - w * dtspw) / w2m1;
 			}
 
 			beta = (onemq * d2tsw + sqrt(pow(onemq * d2tsw, 2) + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
-			alpha = (1 + q) / (beta * (q * dtsw + beta * d2tsw));
+			alpha = onepq / (beta * (q * dtsw + beta * d2tsw));
 			gamma = (alpha * beta * dtsw - 1) / q;
 			delta = 1 - gamma - alpha * tsw;
-
-			alphaemb = (1 + q) / (beta * (q * dtspw + beta * d2tspw));
-			gammaemb = (alphaemb * beta * dtspw - 1) / q;
-			deltaemb = 1 - gammaemb - alphaemb * tspw;
 
 			if (mdeg > iwork[9])
 			{
@@ -496,13 +446,39 @@ int tsrkc3core(const unsigned n,
 			}
 
 			chi = calcchi(tsw, mdeg, q, w, acosht, beta, delta, gamma);
-			err = tsrkc3step(n, x0, x1, *h, y0, y1, f1, atol, rtol, iwork[3], tsw, mdeg, 
-				w, acosht, beta, delta, gamma, chi, deltaemb, gammaemb, f, y2, yjm1, yjm2);
+			tsrkc3step(n, x0, x1, *h, y0, y1, f1, mdeg, w, acosht, beta, delta, gamma, chi, f, y2, yjm1, yjm2);
+
+			temp2 = x1 + *h;
+			f(&n, &temp2, y2, f2);
+
+			err = 0;
+			if (iwork[3] == 0)
+			{
+				for (j = 0; j < n; j++)
+				{
+					temp1 = y1[j] / q - y0[j] / (q * onepq2) - y2[j] * (2 + q) / onepq2 + *h * f2[j] / onepq;
+					temp2 = fmax(fabs(y1[j]), fabs(y2[j])) * (*rtol);
+					err += pow(temp1 / (*atol + temp2), 2);
+				}
+			}
+			else
+			{
+				for (j = 0; j < n; j++)
+				{
+					temp1 = y1[j] / q - y0[j] / (q * onepq2) - y2[j] * (2 + q) / (onepq2) + *h * f2[j] / onepq;
+					temp2 = fmax(fabs(y1[j]), fabs(y2[j])) * rtol[j];
+					err += pow(temp1 / (atol[j] + temp2), 2);
+				}
+			}
+
+			err = sqrt(err / n);
+			err *= 0.6;
+
 			mdego = mdeg;
 		}
 		iwork[5]++;
-		iwork[4] += mdeg - 1;
-		
+		iwork[4] += mdeg;
+
 		if (isfinited(err))
 		{
 			fac = pow(1 / err, 0.3333333333333333);
@@ -523,7 +499,7 @@ int tsrkc3core(const unsigned n,
 			hnew = *h * 0.1;
 			err = 2;
 		}
-		
+
 		if (err < 1)
 		{
 			if (iwork[2] == 1)
@@ -555,12 +531,15 @@ int tsrkc3core(const unsigned n,
 			}
 			else
 			{
-				yswap = y0;
+				swap = y0;
 				y0 = y1;
 				y1 = y2;
-				y2 = yswap;
-				f(&n, &x1, y1, f1);
-				iwork[4]++;
+				y2 = swap;
+
+				swap = f1;
+				f1 = f2;
+				f2 = swap;
+
 				errp = err;
 			}
 		}
@@ -607,6 +586,7 @@ int tsrkc3core(const unsigned n,
 
 	free(res[2]);
 	free(f1);
+	free(f2);
 	free(yjm1);
 	free(yjm2);
 	free(eigvec);
@@ -704,7 +684,7 @@ int tsrkc3(const unsigned n,
 	}
 
 	iwork[4] = 0, iwork[5] = 0, iwork[6] = 0, iwork[7] = 0,
-	iwork[8] = 0, iwork[9] = 0, iwork[10] = 0, iwork[11] = 0;
+		iwork[8] = 0, iwork[9] = 0, iwork[10] = 0, iwork[11] = 0;
 
 	return tsrkc3core(n, x0, x1, xend, h, y0, y1, f, rho, solout, atol, rtol, uround, iwork);
 }

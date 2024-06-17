@@ -1,7 +1,7 @@
 //	Author : A.Moisa
 //		e - mail : andrey.moysa@gmail.com
 //
-//	Version of April 2023
+//	Version of June 2024
 
 
 #include "tsrkc2.h"
@@ -256,7 +256,7 @@ int tsrkc2core(const unsigned n,
 			*h = fabs(xend - x1);
 			last = true;
 		}
-		if (*h < 10 * uround)
+		if (x1 + *h <= x1)
 		{
 			printf("stepsize becomes too small\n");
 			idid = -2;
