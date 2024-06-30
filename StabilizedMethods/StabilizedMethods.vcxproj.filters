@@ -44,13 +44,16 @@
     <ClCompile Include="Problems\hires.cpp">
       <Filter>Source files\Problems</Filter>
     </ClCompile>
-    <ClCompile Include="Problems\problems_common.cpp">
-      <Filter>Source files\Problems</Filter>
-    </ClCompile>
     <ClCompile Include="Problems\rober.cpp">
       <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\heat.cpp">
+      <Filter>Source files\Problems</Filter>
+    </ClCompile>
+    <ClCompile Include="Problems\raddiff2d.cpp">
+      <Filter>Source files\Problems</Filter>
+    </ClCompile>
+    <ClCompile Include="Problems\raddiff.cpp">
       <Filter>Source files\Problems</Filter>
     </ClCompile>
   </ItemGroup>

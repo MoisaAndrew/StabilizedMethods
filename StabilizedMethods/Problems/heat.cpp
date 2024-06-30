@@ -24,6 +24,7 @@ static void fheat(const unsigned* n, const double* x, const double* y, double* f
 void get_heat(
     unsigned* n,
     FcnEqDiff* fcn,
+    Rho* rho,
     double* x,
     double* h,
     double* xend,

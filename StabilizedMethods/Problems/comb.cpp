@@ -54,6 +54,7 @@ static void fcomb(const unsigned* n, const double* x, const double* y, double* f
 void get_comb(
     unsigned* n,
     FcnEqDiff* fcn,
+    Rho* rho,
     double* x,
     double* h,
     double* xend,

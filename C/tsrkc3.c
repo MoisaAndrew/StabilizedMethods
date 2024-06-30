@@ -607,16 +607,16 @@ int tsrkc3core(const unsigned n,
 /// <param name="y1">Additional value of the solution (array of length n)</param>
 /// <param name="f">Name (external) of function computing the value of f(x, y)</param>
 /// <param name="rho">Name (external) of a function giving the spectral radius of the Jacobian matrix.
-/// Supply a dummy function if iwork[0] == 1, and TSRKC2 will compute spectral radius internally</param>
+/// Supply a NULL pointer if iwork[0] == 1, and TSRKC3 will compute spectral radius internally</param>
 /// <param name="solout">Name (external) of a function providing the numerical solution during integration. 
-/// Supply a dummy function if iwork[2] = 0.</param>
+/// Supply a NULL pointer if iwork[2] = 0.</param>
 /// <param name="atol">Absolute error tolerance. Can be scalar or vector of length n</param>
 /// <param name="rtol">Relative error tolerance. Can be scalar or vector of length n</param>
 /// <param name="iwork">Integer array of length 12 that 
 /// gives information on how the problem is to be solved and 
 /// communicates statistics about the integration process.
 /// <para> iwork[0] </para>
-///	<para> = 0 TSRKC2 attempts to compute the spectral radius internally (rho can be a dummy function); </para>
+///	<para> = 0 TSRKC3 attempts to compute the spectral radius internally; </para>
 ///	<para> = 1 rho returns an upper bound of the spectral radius of the Jacobian matrix </para>
 /// <para> iwork[1] </para>
 ///	<para> = 0 The Jacobian is not constant; </para>
@@ -632,7 +632,7 @@ int tsrkc3core(const unsigned n,
 /// <para> 1 Successful computation x = xend; </para>
 /// <para> -1 Invalid input parameters; </para>
 /// <para> -2 Stepsize becomes too small; </para>
-/// <para> -3 The method used in TSRKC2 to estimate the spectral radius did not converge. </para>
+/// <para> -3 The method used in TSRKC3 to estimate the spectral radius did not converge. </para>
 /// <para> iwork[4] - Number of function evaluations </para>
 /// <para> iwork[5] - Number of steps </para>
 /// <para> iwork[6] - Number of accepted steps </para>

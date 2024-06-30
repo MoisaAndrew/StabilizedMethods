@@ -92,6 +92,7 @@ static void fbruss2d(const unsigned* n, const double* x, const double* y, double
 void get_bruss2d(
     unsigned* n,
     FcnEqDiff* fcn,
+    Rho* rho,
     double* x,
     double* h,
     double* xend,

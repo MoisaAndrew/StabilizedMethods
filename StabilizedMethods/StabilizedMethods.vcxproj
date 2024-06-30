@@ -150,7 +150,8 @@
     <ClCompile Include="Problems\finag.cpp" />
     <ClCompile Include="Problems\heat.cpp" />
     <ClCompile Include="Problems\hires.cpp" />
-    <ClCompile Include="Problems\problems_common.cpp" />
+    <ClCompile Include="Problems\raddiff.cpp" />
+    <ClCompile Include="Problems\raddiff2d.cpp" />
     <ClCompile Include="Problems\rober.cpp" />
     <ClCompile Include="StabilizedMethods.cpp" />
     <ClCompile Include="utils.cpp" />

@@ -134,21 +134,20 @@ int tsrkc2trho(const unsigned n, const double x,
 }
 
 
-double tsrkcstep(const unsigned n, 
-	const double x0, const double x1, const double h, 
-	const double* y0, const double* y1, const double* f1, 
-	const double* atol, const double* rtol, const int ntol, 
+void tsrkcstep(const unsigned n,
+	const double x0, const double x1, const double h,
+	const double* y0, const double* y1, const double* f1,
 	const unsigned mdeg,
-	const double w, const double beta, const double gamma, const double gammaemb, const double acosht,
-	const FcnEqDiff f, 
+	const double w, const double beta, const double gamma, const double acosht,
+	const FcnEqDiff f,
 	double* y2, double* yjm1, double* yjm2)
 {
 	double* yswap;
-	double *res = y2;
-	const double s = (double)mdeg, hbeta = h * beta;
-	const double acoshtds = acosht / s;
-	const double onemgamma = 1 - gamma, onemgammaemb = 1 - gammaemb;
-	double coshims, coshi = cosh(acoshtds), tim1wdtiw;
+	double* res = y2;
+	const double hbeta = h * beta;
+	const double acoshtds = acosht / mdeg;
+	const double onemgamma = 1 - gamma;
+	double coshims = 1, coshi = w, tim1wdtiw;
 	double temp1 = hbeta / w, temp2, temp3;
 	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
 	double err = 0;
@@ -174,7 +173,7 @@ double tsrkcstep(const unsigned n,
 		{
 			y2[j] = temp1 * y2[j] + temp2 * yjm1[j] + temp3 * yjm2[j];
 		}
-		
+
 		yswap = yjm2;
 		yjm2 = yjm1;
 		yjm1 = y2;
@@ -186,37 +185,8 @@ double tsrkcstep(const unsigned n,
 
 	for (j = 0; j < n; j++)
 	{
-		y2[j] = gamma * y0[j] + onemgamma * yjm1[j];
-		yjm1[j] = gammaemb * y0[j] + onemgammaemb * yjm2[j];
+		res[j] = gamma * y0[j] + onemgamma * yjm1[j];
 	}
-
-	if (ntol == 0)
-	{
-		for (j = 0; j < n; j++)
-		{
-			temp3 = y2[j] - yjm1[j];
-			ci1 = fmax(fabs(y1[j]), fabs(y2[j])) * (*rtol);
-			err += pow(temp3 / (*atol + ci1), 2);
-		}
-	}
-	else
-	{
-		for (j = 0; j < n; j++)
-		{
-			temp3 = y2[j] - yjm1[j];
-			ci1 = fmax(fabs(y1[j]), fabs(y2[j])) * rtol[j];
-			err += pow(temp3 / (atol[j] + ci1), 2);
-		}
-	}
-
-	err = sqrt(err / n);
-
-	if (res != y2)
-	{
-		memcpy(res, y2, n * sizeof(double));
-	}
-
-	return (0.11399435157357929 * s + 0.02397234947266258) * err;
 }
 
 
@@ -232,18 +202,21 @@ int tsrkc2core(const unsigned n,
 	double errp = 0, hnew, fac, facp, eigmax;
 	unsigned nrej = 0, mdeg, mdego = 0, nrho = 0;
 	const double tsw = 1.1, acosht = acosh(1.1);
-	double s, s2, sm1, sm1ds, s2dls;
-	double w, w2m1, dtsw, d2tsw, tsm1w, dtsm1w;
+	double s, s2dls;
+	double w, w2m1, dtsw, d2tsw;
 	double q, onemq;
-	double beta, alpha, alphaemb, gamma, gammaemb;
+	double beta, alpha, gamma;
 	bool last = false, reject = false;
 	double* y2 = (double*)malloc(n * sizeof(double));
-	double* yswap;
+	double* swap;
 	double *res[3] = { y0, y1, y2 };
 	double* f1 = (double*)malloc(n * sizeof(double));
+	double* f2 = (double*)malloc(n * sizeof(double));
 	double* yjm1 = (double*)malloc(n * sizeof(double));
 	double* yjm2 = (double*)malloc(n * sizeof(double));
 	double* eigvec = (double*)malloc(n * sizeof(double));
+	unsigned j;
+	double temp1, temp2;
 	int idid = 1;
 
 	f(&n, &x1, y1, f1);
@@ -303,35 +276,52 @@ int tsrkc2core(const unsigned n,
 		if (mdeg != mdego)
 		{
 			s = (double)mdeg;
-			s2 = s * s;
 			w = cosh(acosht / s);
 			w2m1 = w * w - 1;
 			dtsw = s * sinh(acosht) / sqrt(w2m1);
-			d2tsw = (s2 * tsw - w * dtsw) / w2m1;
-
-			sm1 = s - 1;
-			sm1ds = sm1 / s;
-			tsm1w = cosh(sm1ds * acosht);
-			dtsm1w = sm1 * sinh(sm1ds * acosht) / sqrt(w2m1);
+			d2tsw = (s * s * tsw - w * dtsw) / w2m1;
 		}
 
 		beta = (onemq * dtsw + sqrt(pow(onemq * dtsw, 2) + 4 * q * tsw * d2tsw)) / (2 * d2tsw);
 		alpha = (1 + q) / (q * tsw + beta * dtsw);
 		gamma = 1 - alpha * tsw;
 
-		alphaemb = (1 + q) / (q * tsm1w + beta * dtsm1w);
-		gammaemb = 1 - alphaemb * tsm1w;
-
 		if (mdeg > iwork[9])
 		{
 			iwork[9] = mdeg;
 		}
 
-		err = tsrkcstep(n, x0, x1, *h, y0, y1, f1, atol, rtol, iwork[3], 
-			mdeg, w, beta, gamma, gammaemb, acosht, f, y2, yjm1, yjm2);
+		tsrkcstep(n, x0, x1, *h, y0, y1, f1, mdeg, w, beta, gamma, acosht, f, y2, yjm1, yjm2);
+
+		temp2 = x1 + *h;
+		f(&n, &temp2, y2, f2);
+
+		err = 0;
+		if (iwork[3] == 0)
+		{
+			for (j = 0; j < n; j++)
+			{
+				temp1 = y1[j] - y2[j] + *h * f2[j];
+				temp2 = fmax(fabs(y1[j]), fabs(y2[j])) * (*rtol);
+				err += pow(temp1 / (*atol + temp2), 2);
+			}
+		}
+		else
+		{
+			for (j = 0; j < n; j++)
+			{
+				temp1 = y1[j] - y2[j] + *h * f2[j];
+				temp2 = fmax(fabs(y1[j]), fabs(y2[j])) * rtol[j];
+				err += pow(temp1 / (atol[j] + temp2), 2);
+			}
+		}
+
+		err = sqrt(err / n);
+		err *= 0.3333333333333333;
+
 		mdego = mdeg;
 		iwork[5]++;
-		iwork[4] += mdeg - 1;
+		iwork[4] += mdeg;
 		
 		if (isfinited(err))
 		{
@@ -385,12 +375,15 @@ int tsrkc2core(const unsigned n,
 			}
 			else
 			{
-				yswap = y0;
+				swap = y0;
 				y0 = y1;
 				y1 = y2;
-				y2 = yswap;
-				f(&n, &x1, y1, f1);
-				iwork[4]++;
+				y2 = swap;
+
+				swap = f1;
+				f1 = f2;
+				f2 = swap;
+
 				errp = err;
 			}
 		}
@@ -437,6 +430,7 @@ int tsrkc2core(const unsigned n,
 
 	free(res[2]);
 	free(f1);
+	free(f2);
 	free(yjm1);
 	free(yjm2);
 	free(eigvec);
@@ -457,16 +451,16 @@ int tsrkc2core(const unsigned n,
 /// <param name="y1">Additional value of the solution (array of length n)</param>
 /// <param name="f">Name (external) of function computing the value of f(x, y)</param>
 /// <param name="rho">Name (external) of a function giving the spectral radius of the Jacobian matrix.
-/// Supply a dummy function if iwork[0] == 1, and TSRKC2 will compute spectral radius internally</param>
+/// Supply a NULL pointer if iwork[0] == 1, and TSRKC2 will compute spectral radius internally</param>
 /// <param name="solout">Name (external) of a function providing the numerical solution during integration. 
-/// Supply a dummy function if iwork[2] = 0.</param>
+/// Supply a NULL pointer if iwork[2] = 0.</param>
 /// <param name="atol">Absolute error tolerance. Can be scalar or vector of length n</param>
 /// <param name="rtol">Relative error tolerance. Can be scalar or vector of length n</param>
 /// <param name="iwork">Integer array of length 12 that 
 /// gives information on how the problem is to be solved and 
 /// communicates statistics about the integration process.
 /// <para> iwork[0] </para>
-///	<para> = 0 TSRKC2 attempts to compute the spectral radius internally (rho can be a dummy function); </para>
+///	<para> = 0 TSRKC2 attempts to compute the spectral radius internally; </para>
 ///	<para> = 1 rho returns an upper bound of the spectral radius of the Jacobian matrix </para>
 /// <para> iwork[1] </para>
 ///	<para> = 0 The Jacobian is not constant; </para>
