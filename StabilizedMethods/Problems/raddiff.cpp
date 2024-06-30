@@ -101,7 +101,7 @@ void get_raddiff(
     double* xend,
     double** y)
 {
-    const unsigned N = 100;
+    const unsigned N = 200;
     *n = 2 * N;
 
     *fcn = fraddiff;

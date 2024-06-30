@@ -1,7 +1,11 @@
 //	Author : A.Moisa
 //		e - mail : andrey.moysa@gmail.com
 //
-//	Version of June 2024
+//	Version of July 2024
+//
+//	A.V. Moisa, A family of two-step second order Runge–Kutta–Chebyshev methods
+//	Journal of Computational and Applied Mathematics 446 (2024)
+//	https://doi.org/10.1016/j.cam.2024.115868
 
 
 #include "tsrkc2.h"

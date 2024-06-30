@@ -1,7 +1,7 @@
 //	Author : A.Moisa
 //		e - mail : andrey.moysa@gmail.com
 //
-//	Version of June 2024
+//	Version of July 2024
 
 
 #include "tsrkc3.h"

@@ -191,7 +191,7 @@ int main()
     // tol_max = 10 ^ fromtolp
     const double fromtolp = -1.0;
     // tol_min = 10 ^ totolp
-    const double totolp = -6.0;
+    const double totolp = -12.0;
     // tol = 10 ^ (fromtolp - i * tolpstep)
     const double tolpstep = 1.0;
     // print stats like number of function evaluations, number of steps, ...
