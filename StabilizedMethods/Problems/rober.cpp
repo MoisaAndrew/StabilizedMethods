@@ -1,4 +1,4 @@
-#include "../problems.h"
+#include "rober.h"
 
 
 static void frober(const unsigned* n, const double* x, const double* y, double* fy)
@@ -9,23 +9,9 @@ static void frober(const unsigned* n, const double* x, const double* y, double* 
 }
 
 
-void get_rober(
-    unsigned* n,
-    FcnEqDiff* fcn,
-    Rho* rho,
-    double* x,
-    double* h,
-    double* xend,
-    double** y)
+void get_rober(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
 {
-    *n = 3;
+    *params = new RoberParams();
 
     *fcn = frober;
-
-    *x = 0.0; *xend = 1.0e6;
-
-    *h = 1e-4;
-
-    *y = (double*)malloc(*n * sizeof(double));
-    (*y)[0] = 1; (*y)[1] = 0; (*y)[2] = 0;
 }

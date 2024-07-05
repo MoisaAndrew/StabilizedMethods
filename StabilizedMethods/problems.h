@@ -5,24 +5,39 @@
 #include <cstdlib>
 
 
-void get_bruss(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+struct ProblemParams
+{
+	unsigned nDefault;
 
-void get_bruss2d(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+	double x0;
+	double h0;
+	double xend;
 
-void get_burgers(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+	bool isRhoDefined;
+	bool isJacConst;
 
-void get_comb(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+	virtual double* y0(const unsigned n) const {};
+};
 
-void get_cusp(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
 
-void get_finag(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+void get_bruss(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
 
-void get_hires(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+void get_bruss2d(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
 
-void get_rober(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+void get_burgers(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
 
-void get_heat(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+void get_comb(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
 
-void get_raddiff(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+void get_cusp(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
 
-void get_raddiff2d(unsigned* n, FcnEqDiff* fcn, Rho* rho, double* x, double* h, double* xend, double** y);
+void get_finag(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
+
+void get_hires(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
+
+void get_rober(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
+
+void get_heat(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
+
+void get_raddiff(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);
+
+void get_raddiff2d(ProblemParams** params, FcnEqDiff* fcn, Rho* rho);

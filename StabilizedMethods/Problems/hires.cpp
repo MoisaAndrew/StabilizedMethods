@@ -1,4 +1,4 @@
-#include "../problems.h"
+#include "hires.h"
 
 
 static void fhires(const unsigned* n, const double* x, const double* y, double* fy)
@@ -14,24 +14,9 @@ static void fhires(const unsigned* n, const double* x, const double* y, double* 
 }
 
 
-void get_hires(
-    unsigned* n,
-    FcnEqDiff* fcn,
-    Rho* rho,
-    double* x,
-    double* h,
-    double* xend,
-    double** y)
+void get_hires(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
 {
-    *n = 8;
+    *params = new HiresParams();
 
     *fcn = fhires;
-
-    *x = 0.0; *xend = 421.8122;
-
-    *h = 1e-5;
-    
-    *y = (double*)malloc(*n * sizeof(double));
-    (*y)[0] = 1.0; (*y)[1] = 0.0; (*y)[2] = 0.0; (*y)[3] = 0.0;
-    (*y)[4] = 0.0; (*y)[5] = 0.0; (*y)[6] = 0.0; (*y)[7] = 0.0057;
 }

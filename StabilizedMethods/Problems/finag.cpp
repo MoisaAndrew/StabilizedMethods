@@ -1,9 +1,4 @@
-#include "../problems.h"
-
-
-static const double alpha = 0.139;
-static const double beta = 2.54;
-static const double eta = 0.008;
+#include "finag.h"
 
 
 static void ffinag(const unsigned* n, const double* x, const double* y, double* fy)
@@ -30,26 +25,9 @@ static void ffinag(const unsigned* n, const double* x, const double* y, double* 
 }
 
 
-void get_finag(
-    unsigned* n,
-    FcnEqDiff* fcn,
-    Rho* rho,
-    double* x,
-    double* h,
-    double* xend,
-    double** y)
+void get_finag(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
 {
-    const unsigned N = 200;
-    *n = 2 * N;
+    *params = new FinagParams();
 
     *fcn = ffinag;
-
-    *x = 0.0; *xend = 400.0;
-
-    *h = 1e-4;
-
-    *y = (double*)malloc(*n * sizeof(double));
-    for (unsigned j = 0; j < *n; j++) {
-        (*y)[j] = 0;
-    }
 }

@@ -1,7 +1,4 @@
-#include "../problems.h"
-
-
-static const double mu = 0.0003;
+#include "burgers.h"
 
 
 static void fburgers(const unsigned* n, const double* x, const double* y, double* fy)
@@ -18,27 +15,9 @@ static void fburgers(const unsigned* n, const double* x, const double* y, double
 }
 
 
-void get_burgers(
-    unsigned* n,
-    FcnEqDiff* fcn,
-    Rho* rho,
-    double* x, 
-    double* h,
-    double* xend,
-    double** y)
+void get_burgers(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
 {
-    *n = 500;
+    *params = new BurgersParams();
 
     *fcn = fburgers;
-
-    *x = 0.0; *xend = 2.5;
-
-    *h = 1e-4;
-
-    *y = (double*)malloc(*n * sizeof(double));
-    for (unsigned i = 0; i < *n; i++)
-    {
-        double temp = (double)(i + 1) / (double)(*n + 1);
-        (*y)[i] = 1.5 * temp * (1. - temp) * (1. - temp);
-    }
 }

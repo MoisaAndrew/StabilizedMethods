@@ -1,7 +1,4 @@
-#include "../problems.h"
-
-
-static const double alpha = 0.02;
+#include "bruss.h"
 
 
 /* right-hand-side function */
@@ -26,28 +23,9 @@ static void fbruss(const unsigned* n, const double* x, const double* y, double* 
 }
 
 
-void get_bruss(
-    unsigned* n,
-    FcnEqDiff* fcn,
-    Rho* rho,
-    double* x,
-    double* h,
-    double* xend,
-    double** y)
+void get_bruss(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
 {
-    const unsigned N = 500;
-    *n = 2 * N;
+    *params = new BrussParams();
 
     *fcn = fbruss;
-
-    *x = 0.0; *xend = 10.0;
-
-    *h = 1e-5;
-
-    *y = (double*)malloc(*n * sizeof(double));
-    for (unsigned i = 1; i <= N; i++)
-    {
-        (*y)[2 * i - 2] = 1.0 + sin(2 * M_PI * i / (N + 1));
-        (*y)[2 * i - 1] = 3.0;
-    }
 }

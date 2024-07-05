@@ -1,4 +1,4 @@
-#include "../problems.h"
+#include "heat.h"
 
 
 static void fheat(const unsigned* n, const double* x, const double* y, double* fy)
@@ -21,27 +21,9 @@ static void fheat(const unsigned* n, const double* x, const double* y, double* f
 /// This problem can be used to test a method's convergence.
 /// Just remove an adaptive step size selection from the method's code.
 /// </summary>
-void get_heat(
-    unsigned* n,
-    FcnEqDiff* fcn,
-    Rho* rho,
-    double* x,
-    double* h,
-    double* xend,
-    double** y)
+void get_heat(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
 {
-    *n = 159;
+    *params = new HeatParams();
 
     *fcn = fheat;
-
-    *x = 0.0; *xend = 1.0;
-
-    *h = 1e-5; //1 / 20.;
-
-    *y = (double*)malloc(*n * sizeof(double));
-    for (unsigned i = 0; i < *n; i++)
-    {
-        double x = (double)(i + 1) / (*n + 1);
-        (*y)[i] = x * (x + 1);
-    }
 }

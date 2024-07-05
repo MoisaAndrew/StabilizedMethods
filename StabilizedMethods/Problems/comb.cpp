@@ -1,10 +1,4 @@
-#include "../problems.h"
-
-
-static const double d = 1.0;
-static const double R = 5.0;
-static const double alpha = 1.0;
-static const double delta = 20.0;
+#include "comb.h"
 
 
 /* right-hand-side function */
@@ -51,27 +45,9 @@ static void fcomb(const unsigned* n, const double* x, const double* y, double* f
 }
 
 
-void get_comb(
-    unsigned* n,
-    FcnEqDiff* fcn,
-    Rho* rho,
-    double* x,
-    double* h,
-    double* xend,
-    double** y)
+void get_comb(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
 {
-    const unsigned N = 80;
-    *n = N * N;
+    *params = new CombParams();
 
     *fcn = fcomb;
-
-    *x = 0.0; *xend = 0.32;
-
-    *h = 1e-7;
-
-    *y = (double*)malloc(*n * sizeof(double));
-    for (unsigned i = 0; i < *n; i++)
-    {
-        (*y)[i] = 1.0;
-    }
 }

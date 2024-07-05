@@ -1,7 +1,4 @@
-#include "../problems.h"
-
-
-static const double k = 5.0e-3;
+#include "raddiff.h"
 
 
 /* right-hand-side function */
@@ -83,7 +80,7 @@ static void fraddiff(const unsigned* n, const double* x, const double* y, double
 }
 
 
-void rhoraddiff(const unsigned* n, const double* x, const double* y, double* eigmax)
+static void rhoraddiff(const unsigned* n, const double* x, const double* y, double* eigmax)
 {
     const unsigned N = (unsigned)(0.5 + 0.5 * *n);
     const double h = 1. / N;
@@ -92,29 +89,10 @@ void rhoraddiff(const unsigned* n, const double* x, const double* y, double* eig
 }
 
 
-void get_raddiff(
-    unsigned* n,
-    FcnEqDiff* fcn,
-    Rho* rho,
-    double* x,
-    double* h,
-    double* xend,
-    double** y)
+void get_raddiff(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
 {
-    const unsigned N = 200;
-    *n = 2 * N;
+    *params = new RadDiffParams();
 
     *fcn = fraddiff;
     *rho = rhoraddiff;
-
-    *x = 0.0; *xend = 3.0;
-
-    *h = 1e-6;
-
-    *y = (double*)malloc(*n * sizeof(double));
-    for (unsigned i = 0; i < *n; i += 2)
-    {
-        (*y)[i] = 1.0e-5;
-        (*y)[i + 1] = 0.05623413251903491;
-    }
 }

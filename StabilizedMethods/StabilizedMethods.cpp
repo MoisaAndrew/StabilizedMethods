@@ -24,9 +24,9 @@ enum MethodName
 
 
 void run_method_test(
-    const unsigned n, const enum MethodName method,
+    const ProblemParams params, const enum MethodName method,
     const double fromtolp, const double totolp, const double tolpstep,
-    const double x0, const double xend, double* yp, double* y0, double* y, const double h0,
+    double* yp, double* y0, double* y,
     const FcnEqDiff fcn, Rho rho, const double* modelsolution,
     double* work, unsigned iwork[12], double* report[2],
     const bool printstats, const bool printreport, const unsigned reportlength)
@@ -54,39 +54,40 @@ void run_method_test(
 
         atol = rtol = pow(10., tolp);
 
-        x = x0;
-        h = h0;
-        memcpy(y, y0, n * sizeof(double));
-        memcpy(yp, y0, n * sizeof(double));
+        x = params.x0;
+        h = params.h0;
+        memcpy(y, y0, params.nDefault * sizeof(double));
+        memcpy(yp, y0, params.nDefault * sizeof(double));
 
         ts = high_resolution_clock::now();
 
         switch (method)
         {
         case ROCK4_F:
-            ROCK4F(&n, &x, &xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
+            ROCK4F(&params.nDefault, &x, &params.xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
             break;
         case ROCK2_F:
-            ROCK2F(&n, &x, &xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
+            ROCK2F(&params.nDefault, &x, &params.xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
             break;
         case ROCK2_C:
-            idid = rock2c(n, x, xend, &h, y, fcn, rho, solout_h, &atol, &rtol, iwork);
+            idid = rock2c(params.nDefault, x, params.xend, &h, y, fcn, rho, solout_h, &atol, &rtol, iwork);
             break;
         case RKC_F:
-            RKCF(&n, fcn, y, &x, &xend, &rtol, &atol, iwork, work, &idid);
+            RKCF(&params.nDefault, fcn, y, &x, &params.xend, &rtol, &atol, iwork, work, &idid);
             break;
         case RKC_C:
-            idid = rkcc(n, x, xend, y, fcn, rho, solout_h, &atol, rtol, iwork);
+            idid = rkcc(params.nDefault, x, params.xend, y, fcn, rho, solout_h, &atol, rtol, iwork);
             break;
         case DUMKA3:
-            idid = dumka3(n, &x, xend, h, atol, rtol, fcn, rho, 
-                y, &(work[0]), &(work[n]), &(work[2 * n]), &(work[3 * n]), &(work[4 * n]), iwork);
+            idid = dumka3(params.nDefault, &x, params.xend, h, atol, rtol, fcn, rho, y, 
+                &(work[0]), &(work[params.nDefault]), &(work[2 * params.nDefault]), 
+                &(work[3 * params.nDefault]), &(work[4 * params.nDefault]), iwork);
             break;
         case TSRKC2:
-            idid = tsrkc2(n, x, x, xend, &h, yp, y, fcn, rho, solout_h, &atol, &rtol, iwork);
+            idid = tsrkc2(params.nDefault, x, x, params.xend, &h, yp, y, fcn, rho, solout_h, &atol, &rtol, iwork);
             break;
         case TSRKC3:
-            idid = tsrkc3(n, x, x, xend, &h, yp, y, fcn, rho, solout_h, &atol, &rtol, iwork);
+            idid = tsrkc3(params.nDefault, x, x, params.xend, &h, yp, y, fcn, rho, solout_h, &atol, &rtol, iwork);
             break;
         }
         
@@ -105,14 +106,14 @@ void run_method_test(
 
                 if (modelsolution != NULL)
                 {
-                    print_error(n, modelsolution, y);
+                    print_error(params.nDefault, modelsolution, y);
                 }
 
                 printf(", time= %.3f ms\n\n", time_span);
             }
             if (printreport && modelsolution != NULL)
             {
-                report[0][i] = get_absolute_error(n, modelsolution, y);
+                report[0][i] = get_absolute_error(params.nDefault, modelsolution, y);
                 report[1][i] = time_span;
                 i++;
             }
@@ -144,46 +145,47 @@ void run_method_test(
 
 int main()
 {
-    unsigned n;
+    ProblemParams* params;
     FcnEqDiff fcn;
-    Rho rho = NULL;
-    double x, x0, xend, h, h0;
+    Rho rho;
+    double x, h;
     double* y, * y0, * yp;
 
     double rtol, atol;
 
     // problem to test
-    get_raddiff(&n, &fcn, &rho, &x0, &h0, &xend, &y0);
+    get_raddiff(&params, &fcn, &rho);
     unsigned iwork[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     // = 0 - methods attempt to compute the spectral radius internally;
     // = 1 - rho returns an upper bound of the spectral radius;
-    iwork[0] = 1;
+    iwork[0] = params->isRhoDefined;
     // = 0 - The Jacobian is not constant; = 1 - The Jacobian is constant;
-    iwork[1] = 1;
+    iwork[1] = params->isJacConst;
     // = 0 - function solout is called after every successful step;
     // = 1 - function solout is never called
     iwork[2] = 0;
     // = 0 - Atol and rtol are scalar; = 1 - Atol and rtol are arrays of length n
     iwork[3] = 0;
 
-    double* work = (double*)malloc(8 * n * sizeof(double));
+    double* work = (double*)malloc(8 * params->nDefault * sizeof(double));
     int idid;
     double* modelsolution = NULL;
 
-    x = x0;
-    h = h0;
-    y = (double*)malloc(n * sizeof(double));
-    yp = (double*)malloc(n * sizeof(double));
-    memcpy(y, y0, n * sizeof(double));
-    memcpy(yp, y0, n * sizeof(double));
+    x = params->x0;
+    h = params->h0;
+    y0 = params->y0(params->nDefault);
+    y = (double*)malloc(params->nDefault * sizeof(double));
+    yp = (double*)malloc(params->nDefault * sizeof(double));
+    memcpy(y, y0, params->nDefault * sizeof(double));
+    memcpy(yp, y0, params->nDefault * sizeof(double));
     
     rtol = 2.0e-15, atol = 2.0e-15;
-    ROCK4F(&n, &x, &xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
+    ROCK4F(&params->nDefault, &x, &params->xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
 
     if (idid == 1)
     {
-        modelsolution = (double*)malloc(n * sizeof(double));
-        memcpy(modelsolution, y, n * sizeof(double));
+        modelsolution = (double*)malloc(params->nDefault * sizeof(double));
+        memcpy(modelsolution, y, params->nDefault * sizeof(double));
 
         printf("maxspr= %i minspr= %i\n\n", iwork[10], iwork[11]);
     }
@@ -213,49 +215,49 @@ int main()
     /*
     printf("\n-----------------------------------------rock4f-----------------------------------------\n");
 
-    run_method_test(n, ROCK4_F, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn, rho,
+    run_method_test(*params, ROCK4_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
     printf("\n-----------------------------------------rock2f-----------------------------------------\n");
 
-    run_method_test(n, ROCK2_F, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn, rho,
+    run_method_test(*params, ROCK2_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
     printf("\n-----------------------------------------rock2c-----------------------------------------\n");
     
-    run_method_test(n, ROCK2_C, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn, rho,
+    run_method_test(*params, ROCK2_C, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
     printf("\n------------------------------------------rkcf------------------------------------------\n");
 
-    run_method_test(n, RKC_F, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn, rho,
+    run_method_test(*params, RKC_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     
     printf("\n------------------------------------------rkcc------------------------------------------\n");
 
-    run_method_test(n, RKC_C, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn, rho,
+    run_method_test(*params, RKC_C, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
     /*
     printf("\n-----------------------------------------dumka3-----------------------------------------\n");
 
-    run_method_test(n, DUMKA3, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn, rho,
+    run_method_test(*params, DUMKA3, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     
     printf("\n-----------------------------------------tsrkc2-----------------------------------------\n");
     
-    run_method_test(n, TSRKC2, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn, rho,
+    run_method_test(*params, TSRKC2, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
     
     printf("\n-----------------------------------------tsrkc3-----------------------------------------\n");
     
-    run_method_test(n, TSRKC3, fromtolp, totolp, tolpstep, x0, xend, yp, y0, y, h0, fcn, rho,
+    run_method_test(*params, TSRKC3, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
 
@@ -264,6 +266,7 @@ int main()
         free(report[0]);
         free(report[1]);
     }
+    free(params);
     free(work);
     free(y);
     free(y0);

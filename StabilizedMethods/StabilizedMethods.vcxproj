@@ -161,6 +161,17 @@
     <ClInclude Include="methods_common.h" />
     <ClInclude Include="problems.h" />
     <ClInclude Include="fortran.h" />
+    <ClInclude Include="Problems\bruss2d.h" />
+    <ClInclude Include="Problems\bruss.h" />
+    <ClInclude Include="Problems\burgers.h" />
+    <ClInclude Include="Problems\comb.h" />
+    <ClInclude Include="Problems\cusp.h" />
+    <ClInclude Include="Problems\finag.h" />
+    <ClInclude Include="Problems\heat.h" />
+    <ClInclude Include="Problems\hires.h" />
+    <ClInclude Include="Problems\raddiff.h" />
+    <ClInclude Include="Problems\raddiff2d.h" />
+    <ClInclude Include="Problems\rober.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>

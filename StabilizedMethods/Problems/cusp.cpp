@@ -1,7 +1,4 @@
-#include "../problems.h"
-
-
-static const double sigma = 1. / 144.;
+#include "cusp.h"
 
 
 static void fcusp(const unsigned* n, const double* x, const double* y, double* fy)
@@ -31,28 +28,9 @@ static void fcusp(const unsigned* n, const double* x, const double* y, double* f
 }
 
 
-void get_cusp(
-    unsigned* n,
-    FcnEqDiff* fcn,
-    Rho* rho,
-    double* x,
-    double* h,
-    double* xend,
-    double** y)
+void get_cusp(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
 {
-    const unsigned N = 32;
-    *n = 3 * N;
+    *params = new CuspParams();
 
     *fcn = fcusp;
-
-    *x = 0.0; *xend = 1.1;
-
-    *h = 1e-8;
-
-    *y = (double*)malloc(*n * sizeof(double));
-    for (unsigned j = 0; j < N; j++) {
-        (*y)[3 * j] = 0;
-        (*y)[3 * j + 1] = -2 * cos(2 * j * M_PI / N);
-        (*y)[3 * j + 2] = 2 * sin(2 * j * M_PI / N);
-    }
 }

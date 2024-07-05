@@ -12,6 +12,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Header files\Problems">
+      <UniqueIdentifier>{cba31907-c229-40b9-a9d7-45f2aaf03f38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="utils.cpp">
@@ -72,6 +75,39 @@
     </ClInclude>
     <ClInclude Include="c.h">
       <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\bruss2d.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\bruss.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\burgers.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\comb.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\cusp.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\finag.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\heat.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\hires.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\rober.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\raddiff.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\raddiff2d.h">
+      <Filter>Header files\Problems</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
