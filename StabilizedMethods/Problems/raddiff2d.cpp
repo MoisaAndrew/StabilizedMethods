@@ -209,7 +209,7 @@ static void fij(
 /* right-hand-side function */
 static void fraddiff2d(const unsigned* n, const double* x, const double* y, double* fy)
 {
-    const unsigned N = (unsigned)(0.5 + sqrt(0.5 * *n));
+    const unsigned N = (unsigned)(0.5 + sqrt(*n / 2));
     const double h = 1. / N;
 
     unsigned i, j, jN = 0;
@@ -435,7 +435,7 @@ static void fraddiff2d(const unsigned* n, const double* x, const double* y, doub
 
 static void rhoraddiff2d(const unsigned* n, const double* x, const double* y, double* eigmax)
 {
-    const unsigned N = (unsigned)(0.5 + sqrt(0.5 * *n));
+    const unsigned N = (unsigned)(0.5 + sqrt(*n / 2));
     const double h = 1. / N;
 
     *eigmax = 8 / (h * h) + 6000;

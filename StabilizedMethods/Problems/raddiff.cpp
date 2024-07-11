@@ -4,7 +4,7 @@
 /* right-hand-side function */
 static void fraddiff(const unsigned* n, const double* x, const double* y, double* fy)
 {
-    const unsigned N = (unsigned)(0.5 + 0.5 * *n);
+    const unsigned N = *n / 2;
     const double h = 1. / N;
 
     double sigmai, sigmaim1, sigmaip1;
@@ -82,7 +82,7 @@ static void fraddiff(const unsigned* n, const double* x, const double* y, double
 
 static void rhoraddiff(const unsigned* n, const double* x, const double* y, double* eigmax)
 {
-    const unsigned N = (unsigned)(0.5 + 0.5 * *n);
+    const unsigned N = *n / 2;
     const double h = 1. / N;
 
     *eigmax = 8 / (h * h) + 6000;
