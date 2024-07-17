@@ -1084,6 +1084,9 @@ int dumka3(const unsigned neqn, double* time, const double tend, const double h0
 		}
 		else {
 			cour(&neqn, &t, y, &cou);
+			// Added by A. Moisa
+			// A case if the cour calculates eigenvalue (see the line 1082)
+			cou = 2.e0 / cou;
 		}
 		iwork[5]++;
 		h = min(h_new, (tend - t));

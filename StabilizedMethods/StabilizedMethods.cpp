@@ -1,12 +1,11 @@
-﻿#include <memory.h>
-#include <stdlib.h>
+﻿#include <memory>
+#include <cstdlib>
 #include <chrono>
 
 #include "fortran.h"
 #include "c.h"
 
 #include "problems.h"
-
 #include "utils.h"
 
 
@@ -23,11 +22,11 @@ enum MethodName
 };
 
 
-void run_method_test(
+static void run_method_test(
     const ProblemParams params, const enum MethodName method,
     const double fromtolp, const double totolp, const double tolpstep,
     double* yp, double* y0, double* y,
-    const FcnEqDiff fcn, Rho rho, const double* modelsolution,
+    const FcnEqDiff fcn, const Rho rho, const double* modelsolution,
     double* work, unsigned iwork[12], double* report[2],
     const bool printstats, const bool printreport, const unsigned reportlength)
 {
@@ -155,17 +154,12 @@ int main()
 
     // problem to test
     get_raddiff(&params, &fcn, &rho);
-    unsigned iwork[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    // = 0 - methods attempt to compute the spectral radius internally;
-    // = 1 - rho returns an upper bound of the spectral radius;
-    iwork[0] = params->isRhoDefined;
-    // = 0 - The Jacobian is not constant; = 1 - The Jacobian is constant;
-    iwork[1] = params->isJacConst;
-    // = 0 - function solout is called after every successful step;
-    // = 1 - function solout is never called
-    iwork[2] = 0;
-    // = 0 - Atol and rtol are scalar; = 1 - Atol and rtol are arrays of length n
-    iwork[3] = 0;
+    unsigned iwork[12] = { params->isRhoDefined, params->isJacConst, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    // print stats like number of function evaluations, number of steps, ...
+    const bool printstats = false;
+    // print work/precision report
+    const bool printreport = true;
 
     double* work = (double*)malloc(8 * params->nDefault * sizeof(double));
     int idid;
@@ -181,7 +175,7 @@ int main()
     
     rtol = 2.0e-15, atol = 2.0e-15;
     ROCK4F(&params->nDefault, &x, &params->xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
-
+    
     if (idid == 1)
     {
         modelsolution = (double*)malloc(params->nDefault * sizeof(double));
@@ -196,10 +190,7 @@ int main()
     const double totolp = -12.0;
     // tol = 10 ^ (fromtolp - i * tolpstep)
     const double tolpstep = 1.0;
-    // print stats like number of function evaluations, number of steps, ...
-    const bool printstats = false;
-    // print work/precision report
-    const bool printreport = true;
+
     const unsigned reportlength = (unsigned)(1.5 + (fromtolp - totolp) / tolpstep);
     double* report[2];
     if (printreport)
