@@ -1,4 +1,4 @@
-#include "rkc.h"
+#include "methods_common.h"
 
 
 int rkcrho(const unsigned n, const double x, const FcnEqDiff f,

@@ -28,22 +28,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="rkc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="rockc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tsrkc2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="methods_common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tsrkc3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dumka3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

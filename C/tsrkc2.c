@@ -1,14 +1,14 @@
 //	Author : A.Moisa
 //		e - mail : andrey.moysa@gmail.com
 //
-//	Version of July 2024
+//	Version of September 2024
 //
-//	A.V. Moisa, A family of two-step second order Runge–Kutta–Chebyshev methods
+//	A.V. Moisa, A family of two-step second order Rungeï¿½Kuttaï¿½Chebyshev methods
 //	Journal of Computational and Applied Mathematics 446 (2024)
 //	https://doi.org/10.1016/j.cam.2024.115868
 
 
-#include "tsrkc2.h"
+#include "methods_common.h"
 
 
 int tsrkc2trho(const unsigned n, const double x,
@@ -251,6 +251,10 @@ int tsrkc2core(const unsigned n,
 				else
 				{
 					idid = tsrkc2trho(n, x1, y1, f1, uround, f, eigvec, yjm1, yjm2, &eigmax, iwork);
+					if (idid == -3)
+					{
+						return -3;
+					}
 				}
 
 				if (eigmax > iwork[10])

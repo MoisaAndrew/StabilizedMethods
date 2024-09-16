@@ -55,7 +55,7 @@
 *  For any questions/suggestions/comments, please send e-mail to: amedovik@math.tulane.edu
 *
 */
-#include "dumka3.h"
+#include "methods_common.h"
 
 #include <stdlib.h>
 #include <stdio.h>

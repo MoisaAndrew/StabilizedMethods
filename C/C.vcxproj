@@ -26,12 +26,7 @@
     <ClCompile Include="tsrkc3.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="dumka3.h" />
     <ClInclude Include="methods_common.h" />
-    <ClInclude Include="rkc.h" />
-    <ClInclude Include="rockc.h" />
-    <ClInclude Include="tsrkc2.h" />
-    <ClInclude Include="tsrkc3.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

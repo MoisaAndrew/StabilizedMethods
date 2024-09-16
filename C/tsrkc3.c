@@ -1,10 +1,10 @@
 //	Author : A.Moisa
 //		e - mail : andrey.moysa@gmail.com
 //
-//	Version of July 2024
+//	Version of September 2024
 
 
-#include "tsrkc3.h"
+#include "methods_common.h"
 
 
 int tsrkc3trho(const unsigned n, const double x,
@@ -338,6 +338,10 @@ int tsrkc3core(const unsigned n,
 				else
 				{
 					idid = tsrkc3trho(n, x1, y1, f1, uround, f, eigvec, yjm1, yjm2, &eigmax, iwork);
+					if (idid == -3)
+					{
+						return -3;
+					}
 				}
 
 				if (eigmax > iwork[10])
