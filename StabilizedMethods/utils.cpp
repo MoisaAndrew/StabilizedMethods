@@ -119,7 +119,7 @@ void print_report(const unsigned report_length, double* report[2])
 		to_wolfram_style(buffer_length, buffer);
 		printf("%s", buffer);
 	}
-	printf("}\n");
+	printf("}\r\n");
 
 	free(buffer);
 }

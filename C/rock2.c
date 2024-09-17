@@ -1863,7 +1863,7 @@ int rockcore(const unsigned n, double x, const double xend, double* h, double* y
 		}
 		if (*h < 10 * uround)
 		{
-			printf("tolerances are too small\n");
+			printf("tolerances are too small\r\n");
 			idid = -2;
 			break;
 		}
@@ -2017,19 +2017,19 @@ int rock2c(const unsigned n, const double x, const double xend, double* h, doubl
 
 	if (*h > fabs(xend - x))
 	{
-		printf("initial step is longer than the integration interval\n");
+		printf("initial step is longer than the integration interval\r\n");
 		return -1;
 	}
 	if (*h < 10 * uround)
 	{
-		printf("initial step-size is too small\n");
+		printf("initial step-size is too small\r\n");
 		return -1;
 	}
 	if (iwork[3] == 0)
 	{
 		if (atol[0] <= 0 || rtol[0] <= 10 * uround)
 		{
-			printf("tolerances are too small\n");
+			printf("tolerances are too small\r\n");
 			return -1;
 		}
 	}
@@ -2039,7 +2039,7 @@ int rock2c(const unsigned n, const double x, const double xend, double* h, doubl
 		{
 			if (atol[i] <= 0 || rtol[i] <= 10 * uround)
 			{
-				printf("tolerances are too small\n");
+				printf("tolerances are too small\r\n");
 				return -1;
 			}
 		}

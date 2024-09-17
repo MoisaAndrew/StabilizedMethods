@@ -233,9 +233,9 @@ int tsrkc2core(const unsigned n,
 			*h = fabs(xend - x1);
 			last = true;
 		}
-		if (x1 + *h <= x1)
+		if (x1 + 10 * *h <= x1)
 		{
-			printf("stepsize becomes too small\n");
+			printf("stepsize becomes too small\r\n");
 			idid = -2;
 			break;
 		}
@@ -507,19 +507,19 @@ int tsrkc2(const unsigned n,
 
 	if (*h > fabs(xend - x1))
 	{
-		printf("initial step is longer than the integration interval\n");
+		printf("initial step is longer than the integration interval\r\n");
 		return -1;
 	}
 	if (*h < 10 * uround)
 	{
-		printf("initial step-size is too small\n");
+		printf("initial step-size is too small\r\n");
 		return -1;
 	}
 	if (iwork[3] == 0)
 	{
 		if (atol[0] <= 0 || rtol[0] <= 10 * uround)
 		{
-			printf("tolerances are too small\n");
+			printf("tolerances are too small\r\n");
 			return -1;
 		}
 	}
@@ -529,7 +529,7 @@ int tsrkc2(const unsigned n,
 		{
 			if (atol[i] <= 0 || rtol[i] <= 10 * uround)
 			{
-				printf("tolerances are too small\n");
+				printf("tolerances are too small\r\n");
 				return -1;
 			}
 		}

@@ -99,8 +99,8 @@ static void run_method_test(
         {
             if (printstats)
             {
-                printf("atol = %1.2e, rtol = %1.2e\n", atol, rtol);
-                printf("fcn= %i step= %i accpt= %i rejct= %i fspr= %i stg= %i\n",
+                printf("atol = %1.2e, rtol = %1.2e\r\n", atol, rtol);
+                printf("fcn= %i step= %i accpt= %i rejct= %i fspr= %i stg= %i\r\n",
                     iwork[4], iwork[5], iwork[6], iwork[7], iwork[8], iwork[9]);
 
                 if (modelsolution != NULL)
@@ -108,7 +108,7 @@ static void run_method_test(
                     print_error(params.nDefault, modelsolution, y);
                 }
 
-                printf(", time= %.3f ms\n\n", time_span);
+                printf(", time= %.3f ms\r\n\r\n", time_span);
             }
             if (printreport && modelsolution != NULL)
             {
@@ -181,7 +181,7 @@ int main()
         modelsolution = (double*)malloc(params->nDefault * sizeof(double));
         memcpy(modelsolution, y, params->nDefault * sizeof(double));
 
-        printf("maxspr= %i minspr= %i\n\n", iwork[10], iwork[11]);
+        printf("maxspr= %i minspr= %i\r\n\r\n", iwork[10], iwork[11]);
     }
     
     // tol_max = 10 ^ fromtolp
@@ -204,49 +204,49 @@ int main()
     // For more accurate time measurements, it is recommended to comment all the methods except one.
     // Do not forget to test speed of the methods in Release configuration only.
     /*
-    printf("\n-----------------------------------------rock4f-----------------------------------------\n");
+    printf("\r\n-----------------------------------------rock4f-----------------------------------------\r\n");
 
     run_method_test(*params, ROCK4_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
-    printf("\n-----------------------------------------rock2f-----------------------------------------\n");
+    printf("\r\n-----------------------------------------rock2f-----------------------------------------\r\n");
 
     run_method_test(*params, ROCK2_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
-    printf("\n-----------------------------------------rock2c-----------------------------------------\n");
+    printf("\r\n-----------------------------------------rock2c-----------------------------------------\r\n");
     
     run_method_test(*params, ROCK2_C, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
-    printf("\n------------------------------------------rkcf------------------------------------------\n");
+    printf("\r\n------------------------------------------rkcf------------------------------------------\r\n");
 
     run_method_test(*params, RKC_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     
-    printf("\n------------------------------------------rkcc------------------------------------------\n");
+    printf("\r\n------------------------------------------rkcc------------------------------------------\r\n");
 
     run_method_test(*params, RKC_C, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
     /*
-    printf("\n-----------------------------------------dumka3-----------------------------------------\n");
+    printf("\r\n-----------------------------------------dumka3-----------------------------------------\r\n");
 
     run_method_test(*params, DUMKA3, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     
-    printf("\n-----------------------------------------tsrkc2-----------------------------------------\n");
+    printf("\r\n-----------------------------------------tsrkc2-----------------------------------------\r\n");
     
     run_method_test(*params, TSRKC2, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
     
-    printf("\n-----------------------------------------tsrkc3-----------------------------------------\n");
+    printf("\r\n-----------------------------------------tsrkc3-----------------------------------------\r\n");
     
     run_method_test(*params, TSRKC3, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);

@@ -129,7 +129,7 @@ bool  isStepAccepted(const unsigned int neqn, const double* z, double* h_new,
 		else {
 			*h_new = frac * (*h_new);
 		}
-		// printf("err= %e time= %e degree= %d new step= %e old step= %e  \n", eps, t, *n_pol_degree, *h_new, h_n);
+		// printf("err= %e time= %e degree= %d new step= %e old step= %e  \r\n", eps, t, *n_pol_degree, *h_new, h_n);
 	}
 	return isnotreject;
 };
@@ -152,7 +152,7 @@ double eigenvalue(const unsigned int neqn, const double* y, double* fy, double t
 	double norminv;
 	//double nrmY = norm(neqn, y);
 	double nrmV = norm(neqn, v);
-	//printf( "Compute eigenvalue ...\n" ); 
+	//printf( "Compute eigenvalue ...\r\n" ); 
 	do {
 		idx++;
 		// all vectors should be ||y-v|| < radius, because problem can be non-linear
@@ -166,8 +166,8 @@ double eigenvalue(const unsigned int neqn, const double* y, double* fy, double t
 			};
 			nrmV = norm(neqn, v);
 			if (nrmV < minimumValue) {
-				printf("Error occur: your GetNonZeroElement function should return a value with strictly positive norm, but it returns 0!\n");
-				printf("Fix GetNonZeroElement function, please. \n");
+				printf("Error occur: your GetNonZeroElement function should return a value with strictly positive norm, but it returns 0!\r\n");
+				printf("Fix GetNonZeroElement function, please. \r\n");
 				return *lambdaOld;
 			};
 		};
@@ -186,7 +186,7 @@ double eigenvalue(const unsigned int neqn, const double* y, double* fy, double t
 		nrmV = norm(neqn, v);
 		*lambdaOld = lambda;
 		lambda = nrmV / radius;
-		//printf( "Iteration = %d eigenvalue = %e \n" , idx, lambda );
+		//printf( "Iteration = %d eigenvalue = %e \r\n" , idx, lambda );
 	} while ((abs((double)(lambda - *lambdaOld)) > (abs(lambda) * tol)) && (idx <= maxit));
 	*lambdaOld = lambda;
 	return 1.2 * lambda;
@@ -1036,19 +1036,19 @@ int dumka3(const unsigned neqn, double* time, const double tend, const double h0
 		return -1;
 	};
 	if (atol < minimumValue) {
-		printf("atol must be positive \n");
+		printf("atol must be positive \r\n");
 		return -1;
 	}
 	if (rtol < minimumValue) {
-		printf("rtol must be positive \n");
+		printf("rtol must be positive \r\n");
 		return -1;
 	}
 	if (h0 < 1.e-14) {
-		printf("Initial step h0 is too small \n");
+		printf("Initial step h0 is too small \r\n");
 		return -1;
 	}
 	if (tend <= t) {
-		printf("End-time Tend is less than initial time \n");
+		printf("End-time Tend is less than initial time \r\n");
 		return -1;
 	}
 	h_new = h0;
@@ -1210,7 +1210,7 @@ int dumka3(const unsigned neqn, double* time, const double tend, const double h0
 				y[j] = z3[j];
 			};
 			t = t_en;
-			//printf ( "Step is rejected. Used degree of polynomial: %d  Time= %e \n", n_pol_degree, t);
+			//printf ( "Step is rejected. Used degree of polynomial: %d  Time= %e \r\n", n_pol_degree, t);
 		}
 		else {
 			iwork[6]++;
