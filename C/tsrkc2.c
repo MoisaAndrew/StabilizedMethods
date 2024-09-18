@@ -468,14 +468,14 @@ int tsrkc2core(const unsigned n,
 /// gives information on how the problem is to be solved and 
 /// communicates statistics about the integration process.
 /// <para> iwork[0] </para>
-///	<para> = 0 TSRKC2 attempts to compute the spectral radius internally; </para>
+///	<para> = 0 TSRKC2 attempts to compute the spectral radius internally </para>
 ///	<para> = 1 rho returns an upper bound of the spectral radius of the Jacobian matrix </para>
 /// <para> iwork[1] </para>
-///	<para> = 0 The Jacobian is not constant; </para>
+///	<para> = 0 The Jacobian is not constant </para>
 ///	<para> = 1 The Jacobian is constant </para>
 /// <para> iwork[2] </para>
-///	<para> = 0 function solout is called after every successful step </para>
-///	<para> = 1 function solout is never called </para>
+///	<para> = 0 function solout is never called </para>
+///	<para> = 1 function solout is called after every successful step </para>
 /// <para> iwork[3] </para>
 ///	<para> = 0 Atol and rtol are scalar </para>
 ///	<para> = 1 Atol and rtol are arrays of length n </para>

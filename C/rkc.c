@@ -178,7 +178,7 @@ int rkclow(const unsigned n, double x, const double xend, double* y,
 	unsigned mmax = fmax(sqrt(rtol / (10. * uround)), 2);
 	unsigned nstsig = 0;
 	const double tdir = xend - x > 0 ? 1. : -1.;
-	const double hmax = tdir * xend - x;
+	const double hmax = tdir * (xend - x);
 	double hmin = 10. * uround * fmax(fabs(x), hmax);
 	double absh, h, hold, est, sprad, wt, at, err, errold, fac, temp1, temp2, ci;
 	unsigned i, m;
@@ -262,7 +262,6 @@ int rkclow(const unsigned n, double x, const double xend, double* y,
 			last = true;
 		}
 		m = 1 + (unsigned)sqrt(1.54 * absh * sprad + 1.);
-
 		if (m > mmax)
 		{
 			m = mmax;
@@ -380,7 +379,7 @@ int rkcc(const unsigned n, const double x, const double xend, double* y,
 	const double* atol, const double rtol,
 	unsigned iwork[10])
 {
-	const double uround = 2.22e-16;
+	const double uround = 1e-16;
 
 	if (n < 0)
 	{
