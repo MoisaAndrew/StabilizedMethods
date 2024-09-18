@@ -1881,7 +1881,7 @@ int rockcore(const unsigned n, double x, const double xend, double* h, double* y
 					idid = rocktrho(n, x, yn, fn, uround, f, eigvec, yjm1, yjm2, &eigmax, iwork);
 					if (idid == -3)
 					{
-						return -3;
+						break;
 					}
 				}
 

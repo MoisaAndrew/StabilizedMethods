@@ -253,7 +253,7 @@ int tsrkc2core(const unsigned n,
 					idid = tsrkc2trho(n, x1, y1, f1, uround, f, eigvec, yjm1, yjm2, &eigmax, iwork);
 					if (idid == -3)
 					{
-						return -3;
+						break;
 					}
 				}
 
