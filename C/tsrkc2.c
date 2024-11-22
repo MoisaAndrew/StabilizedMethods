@@ -154,7 +154,6 @@ void tsrkcstep(const unsigned n,
 	double coshims = 1, coshi = w, tim1wdtiw;
 	double temp1 = hbeta / w, temp2, temp3;
 	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
-	double err = 0;
 	unsigned i, j;
 
 	memcpy(yjm2, y1, n * sizeof(double));

@@ -13,7 +13,6 @@ enum MethodName
 {
     ROCK4_F,
     ROCK2_F,
-    ROCK2_C,
     RKC_F,
     RKC_C,
     DUMKA3,
@@ -38,7 +37,7 @@ static void run_method_test(
     double time_span;
     double x, h;
 
-    if (method == RKC_F || method == RKC_C)
+    if (method == RKC_F)
     {
         i = iwork[2];
         iwork[1] = iwork[0];
@@ -67,9 +66,6 @@ static void run_method_test(
             break;
         case ROCK2_F:
             ROCK2F(&params.nDefault, &x, &params.xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
-            break;
-        case ROCK2_C:
-            idid = rock2c(params.nDefault, x, params.xend, &h, y, fcn, rho, solout_h, &atol, &rtol, iwork);
             break;
         case RKC_F:
             RKCF(&params.nDefault, fcn, y, &x, &params.xend, &rtol, &atol, iwork, work, &idid);
@@ -132,7 +128,7 @@ static void run_method_test(
         print_report(reportlength, report);
     }
 
-    if (method == RKC_F || method == RKC_C)
+    if (method == RKC_F)
     {
         i = iwork[0];
         iwork[0] = iwork[1];
@@ -213,12 +209,6 @@ int main()
     printf("\r\n-----------------------------------------rock2f-----------------------------------------\r\n");
 
     run_method_test(*params, ROCK2_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
-        modelsolution, work, iwork, report, printstats, printreport, reportlength);
-    */
-    /*
-    printf("\r\n-----------------------------------------rock2c-----------------------------------------\r\n");
-    
-    run_method_test(*params, ROCK2_C, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     /*

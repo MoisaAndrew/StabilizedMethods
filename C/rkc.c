@@ -1,15 +1,15 @@
 #include "methods_common.h"
 
 
-int rkcrho(const unsigned n, const double x, const FcnEqDiff f,
-	double* yn, double* fn, double* v, double* fv, double* work,
-	const double hmax, const double uround, double* sprad,
-	unsigned iwork[12])
+double rkcrho(const unsigned n, const double x, const FcnEqDiff f,
+	double* yn, double* fn, double* v, double* fv, double* eigvec,
+	const double hmax, const double uround, unsigned iwork[10])
 {
 	const double safe = 1.2;
+	const unsigned itmax = 50;
 	const double sqrtu = sqrt(uround), small = 1. / hmax;
-	double ynrm = 0., vnrm = 0., sigma, sigmal, dynrm, dfnrm;
-	unsigned i, iter, itmax = 50, index;
+	double ynrm = 0., vnrm = 0., sprad, sigma, sigmal, dynrm, dfnrm;
+	unsigned i, iter, index;
 
 	if (iwork[5] == 0)
 	{
@@ -17,7 +17,7 @@ int rkcrho(const unsigned n, const double x, const FcnEqDiff f,
 	}
 	else
 	{
-		memcpy(v, work, n * sizeof(double));
+		memcpy(v, eigvec, n * sizeof(double));
 	}
 
 	for (i = 0; i < n; i++)
@@ -27,7 +27,7 @@ int rkcrho(const unsigned n, const double x, const FcnEqDiff f,
 	}
 	ynrm = sqrt(ynrm);
 	vnrm = sqrt(vnrm);
-	
+
 	if (ynrm != 0.)
 	{
 		dynrm = ynrm * sqrtu;
@@ -70,7 +70,7 @@ int rkcrho(const unsigned n, const double x, const FcnEqDiff f,
 	for (iter = 1; iter <= itmax; iter++)
 	{
 		f(&n, &x, v, fv);
-		iwork[8]++;			
+		iwork[8]++;
 		dfnrm = 0.;
 		for (i = 0; i < n; i++)
 		{
@@ -79,15 +79,15 @@ int rkcrho(const unsigned n, const double x, const FcnEqDiff f,
 		dfnrm = sqrt(dfnrm);
 		sigmal = sigma;
 		sigma = dfnrm / dynrm;
-		*sprad = safe * sigma;
+		sprad = safe * sigma;
 
 		if (iter >= 2 && fabs(sigma - sigmal) <= 0.01 * fmax(sigma, small))
 		{
 			for (i = 0; i < n; i++)
 			{
-				work[i] = v[i] - yn[i];
+				eigvec[i] = v[i] - yn[i];
 			}
-			return 1;
+			return sprad;
 		}
 
 		if (dfnrm != 0.)
@@ -104,15 +104,16 @@ int rkcrho(const unsigned n, const double x, const FcnEqDiff f,
 		}
 	}
 
-	return 6;
+	return -1;
 }
 
 
-void step(const unsigned n, const double x, const FcnEqDiff f,
-	double* yn, double* fn, const double h, const unsigned m, 
+static void step(const unsigned n, const double x, const FcnEqDiff f,
+	const double* yn, const double* fn, const double h, const unsigned m,
 	double* y, double* yjm1, double* yjm2)
 {
 	unsigned i;
+	double* swap, * res = y;
 
 	double w0 = 1. + 2. / (13. * m * m);
 	double temp1 = w0 * w0 - 1., temp2 = sqrt(temp1);
@@ -129,7 +130,7 @@ void step(const unsigned n, const double x, const FcnEqDiff f,
 	double thjm2 = 0., thjm1 = mus;
 	double zjm1 = w0, zjm2 = 1.;
 	double dzjm1 = 1., dzjm2 = 0.;
-	double d2zjm1 = 0.,	d2zjm2 = 0.;
+	double d2zjm1 = 0., d2zjm2 = 0.;
 
 	double zj, dzj, d2zj, bj, ajm1, mu, nu, thj, cj;
 	for (unsigned j = 2; j <= m; j++)
@@ -153,8 +154,11 @@ void step(const unsigned n, const double x, const FcnEqDiff f,
 
 		if (j < m)
 		{
-			memcpy(yjm2, yjm1, n * sizeof(double));
-			memcpy(yjm1, y, n * sizeof(double));
+			swap = yjm2;
+			yjm2 = yjm1;
+			yjm1 = y;
+			y = swap;
+
 			thjm2 = thjm1;
 			thjm1 = thj;
 			bjm2 = bjm1;
@@ -167,12 +171,18 @@ void step(const unsigned n, const double x, const FcnEqDiff f,
 			d2zjm1 = d2zj;
 		}
 	}
+
+	if (res != y)
+	{
+		memcpy(res, y, n * sizeof(double));
+	}
 }
 
 
-int rkclow(const unsigned n, double x, const double xend, double* y,
+static int rkclow(const unsigned n, double x, const double xend, double* y,
 	const FcnEqDiff f, const Rho rho, const SolTrait solout,
-	unsigned iwork[10], const double rtol, const double* atol, const double uround)
+	const double* atol, const double rtol, const double uround,
+	double* work, unsigned iwork[10])
 {
 	bool newspc = true, jacatt = false, last;
 	unsigned mmax = fmax(sqrt(rtol / (10. * uround)), 2);
@@ -183,12 +193,12 @@ int rkclow(const unsigned n, double x, const double xend, double* y,
 	double absh, h, hold, est, sprad, wt, at, err, errold, fac, temp1, temp2, ci;
 	unsigned i, m;
 
-	double* yn = (double*)malloc(n * sizeof(double));
-	double* fn = (double*)malloc(n * sizeof(double));
-	double* vtemp1 = (double*)malloc(n * sizeof(double));
-	double* vtemp2 = (double*)malloc(n * sizeof(double));
-	double* work = (double*)malloc(n * sizeof(double));
-	int idid = 1;
+	double* yn = &work[0];
+	double* fn = &work[n];
+	double* vtemp1 = &work[2 * n];
+	double* vtemp2 = &work[3 * n];
+	double* eigvec = &work[4 * n];
+	double* swap, * res = y;
 
 	memcpy(yn, y, n * sizeof(double));
 	f(&n, &x, yn, fn);
@@ -198,16 +208,16 @@ int rkclow(const unsigned n, double x, const double xend, double* y,
 	{
 		if (newspc)
 		{
-			if (iwork[1] == 1)
+			if (iwork[0] == 1)
 			{
 				rho(&n, &x, yn, &sprad);
 			}
 			else
 			{
-				idid = rkcrho(n, x, f, yn, fn, vtemp1, vtemp2, work, hmax, uround, &sprad, iwork);
-				if (idid == 6)
+				sprad = rkcrho(n, x, f, yn, fn, vtemp1, vtemp2, eigvec, hmax, uround, iwork);
+				if (sprad < 0)
 				{
-					return idid;
+					return 6;
 				}
 			}
 			jacatt = true;
@@ -262,6 +272,7 @@ int rkclow(const unsigned n, double x, const double xend, double* y,
 			last = true;
 		}
 		m = 1 + (unsigned)sqrt(1.54 * absh * sprad + 1.);
+
 		if (m > mmax)
 		{
 			m = mmax;
@@ -315,16 +326,26 @@ int rkclow(const unsigned n, double x, const double xend, double* y,
 			}
 		}
 
-		if (iwork[0] == 0)
+		if (iwork[2] == 1)
 		{
 			solout(n, x, x + h, y);
 		}
 
 		iwork[6]++;
 		x += h;
-		jacatt = iwork[2] == 1;
+
+		if (last)
+		{
+			if (res != y)
+			{
+				memcpy(res, y, n * sizeof(double));
+			}
+			return 1;
+		}
+
+		jacatt = iwork[1] == 1;
 		nstsig = (nstsig + 1) % 25;
-		if (iwork[1] == 1 || nstsig == 0)
+		if (iwork[0] == 1 || nstsig == 0)
 		{
 			newspc = !jacatt;
 		}
@@ -333,10 +354,13 @@ int rkclow(const unsigned n, double x, const double xend, double* y,
 			newspc = false;
 		}
 
-		memcpy(vtemp2, fn, n * sizeof(double));
-		memcpy(fn, vtemp1, n * sizeof(double));
-		memcpy(vtemp1, yn, n * sizeof(double));
-		memcpy(yn, y, n * sizeof(double));
+		swap = vtemp2;
+		vtemp2 = fn;
+		fn = vtemp1;
+		vtemp1 = yn;
+		yn = y;
+		y = swap;
+
 		fac = 10.;
 		if (iwork[6] == 1)
 		{
@@ -359,18 +383,7 @@ int rkclow(const unsigned n, double x, const double xend, double* y,
 		absh = fmax(hmin, fmin(hmax, absh));
 		errold = err;
 		hold = h;
-		h = tdir * absh;
-		if (last)
-		{
-			return 1;
-		}
 	}
-
-	free(yn);
-	free(fn);
-	free(vtemp1);
-	free(vtemp2);
-	free(work);
 }
 
 
@@ -381,23 +394,16 @@ int rkcc(const unsigned n, const double x, const double xend, double* y,
 {
 	const double uround = 1e-16;
 
-	if (n < 0)
+	if (n <= 0 || uround <= 0 || atol[0] <= 0 || rtol < 10. * uround)
 	{
 		return 5;
 	}
-	if (rtol > 0.1 || rtol < 10. * uround)
-	{
-		return 5;
-	}
-	if (atol[0] < 0)
-	{
-		return 5;
-	}
+
 	if (iwork[3])
 	{
 		for (unsigned i = 1; i < n; i++)
 		{
-			if (atol[i] < 0)
+			if (atol[i] <= 0)
 			{
 				return 5;
 			}
@@ -407,5 +413,11 @@ int rkcc(const unsigned n, const double x, const double xend, double* y,
 	iwork[4] = 0, iwork[5] = 0, iwork[6] = 0,
 	iwork[7] = 0, iwork[8] = 0, iwork[9] = 0;
 
-	return rkclow(n, x, xend, y, f, rho, solout, iwork, rtol, atol, uround);
+	double* work = (double*)malloc(5 * n * sizeof(double));
+
+	int idid = rkclow(n, x, xend, y, f, rho, solout, atol, rtol, uround, work, iwork);
+
+	free(work);
+
+	return idid;
 }

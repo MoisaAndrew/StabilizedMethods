@@ -14,9 +14,6 @@
     <ClCompile Include="rkc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rock2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tsrkc2.c">
       <Filter>Source Files</Filter>
     </ClCompile>

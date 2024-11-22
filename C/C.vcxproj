@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="dumka3.c" />
     <ClCompile Include="rkc.c" />
-    <ClCompile Include="rock2.c" />
     <ClCompile Include="tsrkc2.c" />
     <ClCompile Include="tsrkc3.c" />
   </ItemGroup>
