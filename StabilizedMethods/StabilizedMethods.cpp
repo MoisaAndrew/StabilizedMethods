@@ -71,7 +71,7 @@ static void run_method_test(
             RKCF(&params.nDefault, fcn, y, &x, &params.xend, &rtol, &atol, iwork, work, &idid);
             break;
         case RKC_C:
-            idid = rkcc(params.nDefault, x, params.xend, y, fcn, rho, solout_h, &atol, rtol, iwork);
+            idid = rkc_solver(params.nDefault, x, params.xend, y, fcn, rho, solout_h, &atol, rtol, iwork, 2);
             break;
         case DUMKA3:
             idid = dumka3(params.nDefault, &x, params.xend, h, atol, rtol, fcn, rho, y, 
@@ -79,10 +79,10 @@ static void run_method_test(
                 &(work[3 * params.nDefault]), &(work[4 * params.nDefault]), iwork);
             break;
         case TSRKC2:
-            idid = tsrkc2(params.nDefault, x, x, params.xend, &h, yp, y, fcn, rho, solout_h, &atol, &rtol, iwork);
+            idid = rkc_solver(params.nDefault, x, params.xend, y, fcn, rho, solout_h, &atol, rtol, iwork, 1);
             break;
         case TSRKC3:
-            idid = tsrkc3(params.nDefault, x, x, params.xend, &h, yp, y, fcn, rho, solout_h, &atol, &rtol, iwork);
+            idid = rkc_solver(params.nDefault, x, params.xend, y, fcn, rho, solout_h, &atol, rtol, iwork, 0);
             break;
         }
         

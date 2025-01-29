@@ -11,16 +11,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="rkc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tsrkc2.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tsrkc3.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dumka3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rkc_solver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
