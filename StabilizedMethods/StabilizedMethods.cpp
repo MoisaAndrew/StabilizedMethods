@@ -24,7 +24,7 @@ enum MethodName
 static void run_method_test(
     const ProblemParams params, const enum MethodName method,
     const double fromtolp, const double totolp, const double tolpstep,
-    double* yp, double* y0, double* y,
+    const double* y0, double* y,
     const FcnEqDiff fcn, const Rho rho, const double* modelsolution,
     double* work, unsigned iwork[12], double* report[2],
     const bool printstats, const bool printreport, const unsigned reportlength)
@@ -55,7 +55,6 @@ static void run_method_test(
         x = params.x0;
         h = params.h0;
         memcpy(y, y0, params.nDefault * sizeof(double));
-        memcpy(yp, y0, params.nDefault * sizeof(double));
 
         ts = high_resolution_clock::now();
 
@@ -143,8 +142,6 @@ int main()
     ProblemParams* params;
     FcnEqDiff fcn;
     Rho rho;
-    double x, h;
-    double* y, * y0, * yp;
 
     double rtol, atol;
 
@@ -161,13 +158,12 @@ int main()
     int idid;
     double* modelsolution = NULL;
 
-    x = params->x0;
-    h = params->h0;
-    y0 = params->y0(params->nDefault);
-    y = (double*)malloc(params->nDefault * sizeof(double));
-    yp = (double*)malloc(params->nDefault * sizeof(double));
+    double x = params->x0;
+    double h = params->h0;
+    const double* y0 = params->y0(params->nDefault);
+    
+    double* y = (double*)malloc(params->nDefault * sizeof(double));
     memcpy(y, y0, params->nDefault * sizeof(double));
-    memcpy(yp, y0, params->nDefault * sizeof(double));
     
     rtol = 2.0e-15, atol = 2.0e-15;
     ROCK4F(&params->nDefault, &x, &params->xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
@@ -202,43 +198,43 @@ int main()
     /*
     printf("\r\n-----------------------------------------rock4f-----------------------------------------\r\n");
 
-    run_method_test(*params, ROCK4_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
+    run_method_test(*params, ROCK4_F, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
     printf("\r\n-----------------------------------------rock2f-----------------------------------------\r\n");
 
-    run_method_test(*params, ROCK2_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
+    run_method_test(*params, ROCK2_F, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
     printf("\r\n------------------------------------------rkcf------------------------------------------\r\n");
 
-    run_method_test(*params, RKC_F, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
+    run_method_test(*params, RKC_F, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     
     printf("\r\n------------------------------------------rkcc------------------------------------------\r\n");
 
-    run_method_test(*params, RKC_C, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
+    run_method_test(*params, RKC_C, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
     /*
     printf("\r\n-----------------------------------------dumka3-----------------------------------------\r\n");
 
-    run_method_test(*params, DUMKA3, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
+    run_method_test(*params, DUMKA3, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     */
     
     printf("\r\n-----------------------------------------tsrkc2-----------------------------------------\r\n");
     
-    run_method_test(*params, TSRKC2, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
+    run_method_test(*params, TSRKC2, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
     
     printf("\r\n-----------------------------------------tsrkc3-----------------------------------------\r\n");
     
-    run_method_test(*params, TSRKC3, fromtolp, totolp, tolpstep, yp, y0, y, fcn, rho,
+    run_method_test(*params, TSRKC3, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
 
@@ -250,7 +246,6 @@ int main()
     free(params);
     free(work);
     free(y);
-    free(y0);
-    free(yp);
+    free((void*)y0);
     free(modelsolution);
 }
