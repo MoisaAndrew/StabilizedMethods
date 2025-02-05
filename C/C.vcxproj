@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dumka3.c" />
+    <ClCompile Include="mono.c" />
     <ClCompile Include="rkc_solver.c" />
   </ItemGroup>
   <ItemGroup>

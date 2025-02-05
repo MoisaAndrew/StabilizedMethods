@@ -17,7 +17,8 @@ enum MethodName
     RKC_C,
     DUMKA3,
     TSRKC2,
-    TSRKC3
+    TSRKC3,
+    MONO,
 };
 
 
@@ -82,6 +83,9 @@ static void run_method_test(
             break;
         case TSRKC3:
             idid = rkc_solver(params.nDefault, x, params.xend, y, fcn, rho, solout_h, &atol, rtol, iwork, 0);
+            break;
+        case MONO:
+            idid = mono(params.nDefault, x, params.xend, y, fcn, rho, solout_h, &atol, rtol, iwork);
             break;
         }
         
@@ -235,6 +239,12 @@ int main()
     printf("\r\n-----------------------------------------tsrkc3-----------------------------------------\r\n");
     
     run_method_test(*params, TSRKC3, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
+        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    
+    
+    printf("\r\n------------------------------------------mono------------------------------------------\r\n");
+
+    run_method_test(*params, MONO, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
         modelsolution, work, iwork, report, printstats, printreport, reportlength);
     
 

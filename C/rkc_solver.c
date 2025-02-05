@@ -183,7 +183,7 @@ static void step_rkc(const unsigned n, const double x, const FcnEqDiff f,
 
 
 static void step_tsrkc2(const unsigned n,
-	const double x0, const double x1, const double h,
+	const double x1, const double h,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m,
 	const double w, const double beta, const double gamma, const double acosht,
@@ -200,9 +200,9 @@ static void step_tsrkc2(const unsigned n,
 	unsigned i, j;
 
 	memcpy(yjm2, y1, n * sizeof(double));
-	for (i = 0; i < n; i++)
+	for (j = 0; j < n; j++)
 	{
-		yjm1[i] = yjm2[i] + temp1 * f1[i];
+		yjm1[j] = yjm2[j] + temp1 * f1[j];
 	}
 
 	for (i = 2; i <= m; i++)
@@ -229,15 +229,16 @@ static void step_tsrkc2(const unsigned n,
 		ci2 = ci1;
 	}
 
+	temp3 = 1 - gamma;
 	for (j = 0; j < n; j++)
 	{
-		res[j] = (1 - gamma) * y0[j] + gamma * yjm1[j];
+		res[j] = temp3 * y0[j] + gamma * yjm1[j];
 	}
 }
 
 
 static void step_tsrkc3(const unsigned n,
-	const double x0, const double x1, const double h,
+	const double x1, const double h,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m,
 	const double w, const double acosht,
@@ -256,9 +257,9 @@ static void step_tsrkc3(const unsigned n,
 	unsigned i, j;
 
 	memcpy(yjm2, y1, n * sizeof(double));
-	for (i = 0; i < n; i++)
+	for (j = 0; j < n; j++)
 	{
-		yjm1[i] = yjm2[i] + temp1 * f1[i];
+		yjm1[j] = yjm2[j] + temp1 * f1[j];
 	}
 
 	for (i = 2; i <= m; i++)
@@ -285,9 +286,10 @@ static void step_tsrkc3(const unsigned n,
 		ci2 = ci1;
 	}
 
+	temp2 = 1 - gamma - onemdmgdchi;
 	for (j = 0; j < n; j++)
 	{
-		res[j] = (1 - gamma - onemdmgdchi) * y1[j] + gamma * y0[j] + onemdmgdchi * yjm1[j];
+		res[j] = temp2 * y1[j] + gamma * y0[j] + onemdmgdchi * yjm1[j];
 	}
 }
 
@@ -650,7 +652,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			chi = calc_chi(tsw, m, q, w, acosht, beta, delta, gamma);
 
 			h = tdir * absh;
-			step_tsrkc3(n, xold, x, h, yold, yn, fn, m, w, acosht, beta, delta, gamma, chi, f, y, vtemp1, vtemp2);
+			step_tsrkc3(n, x, h, yold, yn, fn, m, w, acosht, beta, delta, gamma, chi, f, y, vtemp1, vtemp2);
 		}
 		else if (method == 1) // TSRKC2
 		{
@@ -683,7 +685,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			gamma = (1 + q) * tsw / (q * tsw + beta * dtsw);
 
 			h = tdir * absh;
-			step_tsrkc2(n, xold, x, h, yold, yn, fn, m, w, beta, gamma, acosht, f, y, vtemp1, vtemp2);
+			step_tsrkc2(n, x, h, yold, yn, fn, m, w, beta, gamma, acosht, f, y, vtemp1, vtemp2);
 		}
 
 		hmin = 10. * uround * fmax(fabs(x), fabs(x + h));

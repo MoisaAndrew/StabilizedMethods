@@ -17,6 +17,9 @@
     <ClCompile Include="rkc_solver.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mono.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="methods_common.h">

@@ -53,6 +53,15 @@ extern "C"
         const double* atol, const double rtol,
         unsigned iwork[10], const int method);
 
+    /// <summary>
+    /// Monotonic stabilized method by B. Faleichik
+    /// <para> Parameters are the same as for the rkc_solver </para>
+    /// </summary>
+    int mono(const unsigned n, const double x, const double xend, double* y,
+        const FcnEqDiff f, const Rho rho, const SolTrait solout,
+        const double* atol, const double rtol,
+        unsigned iwork[10]);
+
 
     int dumka3(const unsigned neqn, double* time, const double tend, const double h0,
         const double atol, const double rtol,
