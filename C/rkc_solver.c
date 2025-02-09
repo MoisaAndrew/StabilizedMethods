@@ -1,4 +1,4 @@
-//	Version of January 2025
+//	Version of February 2025
 
 
 #include "methods_common.h"
@@ -343,7 +343,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 	const double errpow = method == 1 ? 0.5 : 0.3333333333333333;
 	double hmin = 10. * uround * fmax(fabs(x), hmax);
 	double absh, h, abshold, est, sprad, wt, at, err, errold, fac, temp, ci;
-	double xold, q, onemq, onepq, onepq2, s, s2, w, w2, w2m1, dtsw, d2tsw, d3tsw;
+	double q, onemq, onepq, onepq2, s, s2, w, w2, w2m1, dtsw, d2tsw, d3tsw;
 	double alpha, beta, gamma, delta, chi;
 	unsigned i, m, mold = 0;
 
@@ -498,7 +498,6 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		}
 
 		iwork[6]++;
-		xold = x;
 		x += h;
 
 		if (last)
@@ -760,7 +759,6 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		}
 
 		iwork[6]++;
-		xold = x;
 		x += h;
 
 		if (last)

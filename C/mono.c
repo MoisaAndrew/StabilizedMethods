@@ -1145,7 +1145,7 @@ static int mono_core(const unsigned n, double x, const double xend, double* y,
 	const double facmax = 10;
 	const double errpow = 0.5;
 	double hmin = 10. * uround * fmax(fabs(x), hmax);
-	double xold, absh, h, abshold, est, sprad, wt, at, err, errold, fac, temp, ci;
+	double absh, h, abshold, est, sprad, wt, at, err, errold, fac, temp, ci;
 	double w0, w1, b, c, d;
 	unsigned i, m;
 
@@ -1324,7 +1324,6 @@ static int mono_core(const unsigned n, double x, const double xend, double* y,
 		}
 
 		iwork[6]++;
-		xold = x;
 		x += h;
 
 		if (last)
