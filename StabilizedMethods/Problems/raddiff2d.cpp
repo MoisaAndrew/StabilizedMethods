@@ -20,17 +20,17 @@ static void fij(
     double sigmaij = 1 / pow(Tij, 3);
     double sigmaim1j, sigmaip1j, sigmaijm1, sigmaijp1;
 
-    if (isnan(Eim1j))
+    if (isnand(Eim1j))
     {
         sigmaim1j = sigmaij;
         sigmaip1j = 1 / pow(Tip1j, 3);
         Eim1j = (1 - (0.125 - 1 / (6 * sigmaij * h)) * Eij) / (0.125 + 1 / (6 * sigmaij * h));
         Tim1j = Tij;
-        if (!isnan(Eijm1))
+        if (!isnand(Eijm1))
         {
             Eim1jm1 = (1 - (0.125 - pow(Tijm1, 3) / (6 * h)) * Eijm1) / (0.125 + pow(Tijm1, 3) / (6 * h));
         }
-        if (!isnan(Eijp1))
+        if (!isnand(Eijp1))
         {
             Eim1jp1 = (1 - (0.125 - pow(Tijp1, 3) / (6 * h)) * Eijp1) / (0.125 + pow(Tijp1, 3) / (6 * h));
         }
@@ -38,16 +38,16 @@ static void fij(
     else
     {
         sigmaim1j = 1 / pow(Tim1j, 3);
-        if (isnan(Eip1j))
+        if (isnand(Eip1j))
         {
             sigmaip1j = sigmaij;
             Eip1j = -(0.125 - 1 / (6 * sigmaij * h)) * Eij / (0.125 + 1 / (6 * sigmaij * h));
             Tip1j = Tij;
-            if (!isnan(Eijm1))
+            if (!isnand(Eijm1))
             {
                 Eip1jm1 =  -(0.125 - pow(Tijm1, 3) / (6 * h)) * Eijm1 / (0.125 + pow(Tijm1, 3) / (6 * h));
             }
-            if (!isnan(Eijp1))
+            if (!isnand(Eijp1))
             {
                 Eip1jp1 = -(0.125 - pow(Tijp1, 3) / (6 * h)) * Eijp1 / (0.125 + pow(Tijp1, 3) / (6 * h));
             }
@@ -55,28 +55,28 @@ static void fij(
         else
         {
             sigmaip1j = 1 / pow(Tip1j, 3);
-            if (isnan(Eim2j))
+            if (isnand(Eim2j))
             {
                 Eim2j = (1 - (0.125 - 1 / (6 * sigmaim1j * h)) * Eim1j) / (0.125 + 1 / (6 * sigmaim1j * h));
             }
-            else if (isnan(Eip2j))
+            else if (isnand(Eip2j))
             {
                 Eip2j = -(0.125 - 1 / (6 * sigmaip1j * h)) * Eip1j / (0.125 + 1 / (6 * sigmaip1j * h));
             }
         }
     }
     
-    if (isnan(Eijm1))
+    if (isnand(Eijm1))
     {
         sigmaijm1 = sigmaij;
         sigmaijp1 = 1 / pow(Tijp1, 3);
         Eijm1 = Eij;
         Tijm1 = Tij;
-        if (!isnan(Eim2j))
+        if (!isnand(Eim2j))
         {
             Eim1jm1 = Eim1j;
         }
-        if (!isnan(Eip2j))
+        if (!isnand(Eip2j))
         {
             Eip1jm1 = Eip1j;
         }
@@ -84,16 +84,16 @@ static void fij(
     else
     {
         sigmaijm1 = 1 / pow(Tijm1, 3);
-        if (isnan(Eijp1))
+        if (isnand(Eijp1))
         {
             sigmaijp1 = sigmaij;
             Eijp1 = Eij;
             Tijp1 = Tij;
-            if (!isnan(Eim2j))
+            if (!isnand(Eim2j))
             {
                 Eim1jp1 = Eim1j;
             }
-            if (!isnan(Eip2j))
+            if (!isnand(Eip2j))
             {
                 Eip1jp1 = Eip1j;
             }
@@ -101,11 +101,11 @@ static void fij(
         else
         {
             sigmaijp1 = 1 / pow(Tijp1, 3);
-            if (isnan(Eijm2))
+            if (isnand(Eijm2))
             {
                 Eijm2 = Eijm1;
             }
-            else if(isnan(Eijp2))
+            else if(isnand(Eijp2))
             {
                 Eijp2 = Eijp1;
             }
@@ -115,13 +115,13 @@ static void fij(
     double D1ij = 1 / (3 * sigmaij + sqrt(pow(Eip1j - Eim1j, 2) + pow(Eijp1 - Eijm1, 2)) / (2 * h * Eij));
     double D1im1j, D1ip1j, D1ijm1, D1ijp1;
     
-    if (isnan(Eim2j))
+    if (isnand(Eim2j))
     {
-        if (isnan(Eim1jm1))
+        if (isnand(Eim1jm1))
         {
             D1im1j = 1 / (3 * sigmaim1j + sqrt(pow(Eij - Eim1j, 2) + pow(Eim1jp1 - Eim1j, 2)) / (h * Eim1j));
         }
-        else if (isnan(Eim1jp1))
+        else if (isnand(Eim1jp1))
         {
             D1im1j = 1 / (3 * sigmaim1j + sqrt(pow(Eij - Eim1j, 2) + pow(Eim1j - Eim1jm1, 2)) / (h * Eim1j));
         }
@@ -135,13 +135,13 @@ static void fij(
         D1im1j = 1 / (3 * sigmaim1j + sqrt(pow(Eij - Eim2j, 2) + pow(Eim1jp1 - Eim1jm1, 2)) / (2 * h * Eim1j));
     }
     
-    if (isnan(Eip2j))
+    if (isnand(Eip2j))
     {
-        if (isnan(Eip1jm1))
+        if (isnand(Eip1jm1))
         {
             D1ip1j = 1 / (3 * sigmaip1j + sqrt(pow(Eip1j - Eij, 2) + pow(Eip1jp1 - Eip1j, 2)) / (h * Eip1j));
         }
-        else if (isnan(Eip1jp1))
+        else if (isnand(Eip1jp1))
         {
             D1ip1j = 1 / (3 * sigmaip1j + sqrt(pow(Eip1j - Eij, 2) + pow(Eip1j - Eip1jm1, 2)) / (h * Eip1j));
         }
@@ -155,13 +155,13 @@ static void fij(
         D1ip1j = 1 / (3 * sigmaip1j + sqrt(pow(Eip2j - Eij, 2) + pow(Eip1jp1 - Eip1jm1, 2)) / (2 * h * Eip1j));
     }
     
-    if (isnan(Eijm2))
+    if (isnand(Eijm2))
     {
-        if (isnan(Eim1jm1))
+        if (isnand(Eim1jm1))
         {
             D1ijm1 = 1 / (3 * sigmaijm1 + sqrt(pow(Eip1jm1 - Eij, 2) + pow(Eij - Eijm1, 2)) / (h * Eijm1));
         }
-        else if (isnan(Eip1jm1))
+        else if (isnand(Eip1jm1))
         {
             D1ijm1 = 1 / (3 * sigmaijm1 + sqrt(pow(Eij - Eim1jm1, 2) + pow(Eij - Eijm1, 2)) / (h * Eijm1));
         }
@@ -175,13 +175,13 @@ static void fij(
         D1ijm1 = 1 / (3 * sigmaijm1 + sqrt(pow(Eip1jm1 - Eim1jm1, 2) + pow(Eij - Eijm2, 2)) / (2 * h * Eijm1));
     }
 
-    if (isnan(Eijp2))
+    if (isnand(Eijp2))
     {
-        if (isnan(Eim1jp1))
+        if (isnand(Eim1jp1))
         {
             D1ijp1 = 1 / (3 * sigmaijp1 + sqrt(pow(Eip1jp1 - Eim1j, 2) + pow(Eijp1 - Eij, 2)) / (h * Eijp1));
         }
-        else if (isnan(Eip1jp1))
+        else if (isnand(Eip1jp1))
         {
             D1ijp1 = 1 / (3 * sigmaijp1 + sqrt(pow(Eip1j - Eim1jp1, 2) + pow(Eijp1 - Eij, 2)) / (h * Eijp1));
         }

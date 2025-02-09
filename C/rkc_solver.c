@@ -710,11 +710,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				return 3;
 			}
 
-			if (method == 2)
-			{
-				est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
-			}
-			else if (method == 0)
+			if (method == 0)
 			{
 				if (iwork[6] == 0)
 				{
@@ -729,6 +725,11 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			{
 				est = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
 			}
+			else if (method == 2)
+			{
+				est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
+			}
+
 			err = err + pow(est / wt, 2);
 		}
 		err = sqrt(err / n);
