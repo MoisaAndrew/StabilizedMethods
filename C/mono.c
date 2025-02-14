@@ -1137,7 +1137,6 @@ static int mono_core(const unsigned n, double x, const double xend, double* y,
 	};
 
 	bool newspc = true, jacatt = false, last;
-	const unsigned mmax = 2003;
 	unsigned nstsig = 0;
 	const double tdir = xend - x > 0 ? 1. : -1.;
 	const double hmax = tdir * (xend - x);
@@ -1234,15 +1233,15 @@ static int mono_core(const unsigned n, double x, const double xend, double* y,
 			last = true;
 		}
 
-		m = 1 + (unsigned)pow(2.33 * absh * sprad, 0.55);
+		m = pow(1.8547887825836553 * absh * sprad, 0.533871357807877) - 0.3306782178712795;
 		if (m < 3)
 		{
 			m = 3;
 		}
-		else if (m > mmax)
+		else if (m > 2003)
 		{
-			m = mmax;
-			absh = pow(m, 1.8181818181818181) / (2.33 * sprad);
+			m = 2003;
+			absh = 483183.4755765394 / sprad;
 			last = false;
 		}
 

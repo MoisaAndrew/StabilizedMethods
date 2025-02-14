@@ -467,7 +467,20 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		{
 			return 3;
 		}
-		est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
+
+		if (method == 0)
+		{
+			est = 1.2 * (yn[i] - y[i]) + 0.6 * h * (fn[i] + vtemp1[i]);
+		}
+		else if (method == 1)
+		{
+			est = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
+		}
+		else
+		{
+			est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
+		}
+
 		err = err + pow(est / wt, 2);
 	}
 	err = sqrt(err / n);
@@ -518,31 +531,6 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		else
 		{
 			newspc = false;
-		}
-
-		if (method == 1) // TSRKC2
-		{
-			err = 0.;
-			at = atol[0];
-			for (i = 0; i < n; i++)
-			{
-				if (iwork[3])
-				{
-					at = atol[i];
-				}
-				wt = at + rtol * fmax(fabs(y[i]), fabs(yn[i]));
-				if (wt == 0)
-				{
-					return 3;
-				}
-				est = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
-				err = err + pow(est / wt, 2);
-			}
-			err = sqrt(err / n);
-		}
-		else if (method == 0) // TSRKC3
-		{
-			err *= 1.5;
 		}
 
 		swap = vtemp2;
@@ -615,7 +603,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			onepq = 1 + q;
 			onepq2 = onepq * onepq;
 
-			m = 1 + sqrt(absh * sprad * 1.267029788142009 * (onemq + sqrt(1 + q * (0.44256220745562963 + q))));
+			m = 1 + (unsigned)sqrt(absh * sprad * 1.267029788142009 * (onemq + sqrt(1 + q * (0.44256220745562963 + q))));
 			if (m < 3)
 			{
 				m = 3;
