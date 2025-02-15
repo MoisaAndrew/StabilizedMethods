@@ -1233,7 +1233,7 @@ static int mono_core(const unsigned n, double x, const double xend, double* y,
 			last = true;
 		}
 
-		m = pow(1.8547887825836553 * absh * sprad, 0.533871357807877) - 0.3306782178712795;
+		m = 1.8547887825836553 * pow(absh * sprad, 0.533871357807877) - 0.3306782178712795;
 		if (m < 3)
 		{
 			m = 3;
