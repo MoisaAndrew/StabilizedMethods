@@ -242,7 +242,7 @@ static void step_tsrkc3(const unsigned n,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m,
 	const double w, const double acosht,
-	const double beta, const double delta,
+	const double beta, const double deltadchi,
 	const double gamma, const double chi,
 	const FcnEqDiff f,
 	double* y2, double* yjm1, double* yjm2)
@@ -250,7 +250,7 @@ static void step_tsrkc3(const unsigned n,
 	double* yswap;
 	double* res = y2;
 	const double hbeta = h * beta, acoshtds = acosht / m;
-	const double onemdmgdchi = (1 - delta - gamma) / chi, chim1 = chi - 1;
+	const double chim1 = chi - 1;
 	double coshims = 1, coshi = w, tim1wdtiw;
 	double temp1 = chi * hbeta / w, temp2, temp3;
 	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
@@ -286,10 +286,10 @@ static void step_tsrkc3(const unsigned n,
 		ci2 = ci1;
 	}
 
-	temp2 = 1 - gamma - onemdmgdchi;
+	temp2 = 1 - gamma - deltadchi;
 	for (j = 0; j < n; j++)
 	{
-		res[j] = temp2 * y1[j] + gamma * y0[j] + onemdmgdchi * yjm1[j];
+		res[j] = temp2 * y1[j] + gamma * y0[j] + deltadchi * yjm1[j];
 	}
 }
 
@@ -323,7 +323,7 @@ static double calc_chi(const double tsw, const unsigned mdeg, const double q,
 		ci2 = ci1;
 	}
 
-	sumbc2 *= 6 * beta * (1 - delta - gamma) / tsw;
+	sumbc2 *= 6 * beta * delta / tsw;
 
 	return (1 + gamma * pow(q, 3)) / sumbc2;
 }
@@ -633,13 +633,13 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			}
 
 			beta = (onemq * d2tsw + sqrt(pow(onemq * d2tsw, 2) + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
-			alpha = onepq / (beta * (q * dtsw + beta * d2tsw));
-			gamma = (alpha * beta * dtsw - 1) / q;
-			delta = 1 - gamma - alpha * tsw;
+			alpha = onepq / (q * dtsw + beta * d2tsw);
+			gamma = (alpha * dtsw - 1) / q;
+			delta = alpha * tsw / beta;
 			chi = calc_chi(tsw, m, q, w, acosht, beta, delta, gamma);
 
 			h = tdir * absh;
-			step_tsrkc3(n, x, h, yold, yn, fn, m, w, acosht, beta, delta, gamma, chi, f, y, vtemp1, vtemp2);
+			step_tsrkc3(n, x, h, yold, yn, fn, m, w, acosht, beta, delta / chi, gamma, chi, f, y, vtemp1, vtemp2);
 		}
 		else if (method == 1) // TSRKC2
 		{
