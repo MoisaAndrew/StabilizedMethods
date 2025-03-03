@@ -82,7 +82,6 @@ static double rkc_rho(const unsigned n, const double x, const FcnEqDiff f,
 		dfnrm = sqrt(dfnrm);
 		sigmal = sigma;
 		sigma = dfnrm / dynrm;
-		sprad = safe * sigma;
 
 		if (iter >= 2 && fabs(sigma - sigmal) <= 0.01 * fmax(sigma, small))
 		{
@@ -90,7 +89,7 @@ static double rkc_rho(const unsigned n, const double x, const FcnEqDiff f,
 			{
 				eigvec[i] = v[i] - yn[i];
 			}
-			return sprad;
+			return safe * sigma;
 		}
 
 		if (dfnrm != 0.)
@@ -603,12 +602,9 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			onepq = 1 + q;
 			onepq2 = onepq * onepq;
 
-			m = 1 + (unsigned)sqrt(absh * sprad * 1.267029788142009 * (onemq + sqrt(1 + q * (0.44256220745562963 + q))));
-			if (m < 3)
-			{
-				m = 3;
-			}
-			else if (m > mmax)
+			m = 1 + (unsigned)sqrt(4. + absh * sprad * 1.267029788142009 * (onemq + sqrt(1 + q * (0.44256220745562963 + q))));
+			
+			if (m > mmax)
 			{
 				m = mmax;
 				absh = 0.789247426823654 * m * (m + 2.534059576284018 * abshold * sprad) 
@@ -643,13 +639,9 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		}
 		else if (method == 1) // TSRKC2
 		{
-			m = 1 + (unsigned)sqrt(absh * sprad * 0.759782816506459 * (onemq + sqrt(1 + q * (q - 0.598626091572911))));
+			m = 1 + (unsigned)sqrt(1. + absh * sprad * 0.759782816506459 * (onemq + sqrt(1 + q * (q - 0.598626091572911))));
 
-			if (m < 2)
-			{
-				m = 2;
-			}
-			else if (m > mmax)
+			if (m > mmax)
 			{
 				m = mmax;
 				absh = 1.316165591370016 * m * (m + 1.519565633012918 * abshold * sprad)
