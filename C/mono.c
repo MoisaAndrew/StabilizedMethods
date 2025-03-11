@@ -132,7 +132,7 @@ static void step_mono(const unsigned n, const double x, const FcnEqDiff f,
 	}
 	
 	double thjm2 = 0., thjm1 = mus, thj;
-	double zjm1 = w0, zj, bj, ajm1, mu, nu, cj, bjdbjm1, onemmumnu;
+	double zjm1 = w0, zj, bj, mu, nu, cj, bjdbjm1, onemmumnu;
 	for (unsigned j = 2; j <= m; j++)
 	{
 		zj = cosh(j * acoshw0);
@@ -141,16 +141,15 @@ static void step_mono(const unsigned n, const double x, const FcnEqDiff f,
 		mu = 2. * w0 * bjdbjm1;
 		nu = -bj / bjm2;
 		mus = 2. * w1 * bjdbjm1;
-		ajm1 = 1. - zjm1 * bjm1;
 		onemmumnu = 1. - mu - nu;
 
 		cj = x + h * thjm1;
 		f(&n, &cj, yjm1, y);
 		for (i = 0; i < n; i++)
 		{
-			y[i] = mu * yjm1[i] + nu * yjm2[i] + onemmumnu * yn[i] + h * mus * (y[i] - ajm1 * fn[i]);
+			y[i] = mu * yjm1[i] + nu * yjm2[i] + onemmumnu * yn[i] + h * mus * (y[i] - bjm1 * fn[i]);
 		}
-		thj = mu * thjm1 + nu * thjm2 + mus * (1. - ajm1);
+		thj = mu * thjm1 + nu * thjm2 + mus * (1. - bjm1);
 
 		if (j < m)
 		{
