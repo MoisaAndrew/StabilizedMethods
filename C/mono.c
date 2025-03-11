@@ -1,4 +1,4 @@
-//	Version of February 2025
+//	Version of March 2025
 
 
 #include "methods_common.h"
@@ -132,7 +132,7 @@ static void step_mono(const unsigned n, const double x, const FcnEqDiff f,
 	}
 	
 	double thjm2 = 0., thjm1 = mus, thj;
-	double zjm1 = w0, zj, bj, mu, nu, cj, bjdbjm1, onemmumnu;
+	double zj, bj, mu, nu, cj, bjdbjm1, onemmumnu;
 	for (unsigned j = 2; j <= m; j++)
 	{
 		zj = cosh(j * acoshw0);
@@ -162,7 +162,6 @@ static void step_mono(const unsigned n, const double x, const FcnEqDiff f,
 			thjm1 = thj;
 			bjm2 = bjm1;
 			bjm1 = bj;
-			zjm1 = zj;
 		}
 	}
 

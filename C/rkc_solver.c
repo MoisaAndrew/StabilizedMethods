@@ -1,4 +1,4 @@
-//	Version of February 2025
+//	Version of March 2025
 
 
 #include "methods_common.h"
@@ -11,7 +11,7 @@ static double rkc_rho(const unsigned n, const double x, const FcnEqDiff f,
 	const double safe = 1.2;
 	const unsigned itmax = 50;
 	const double sqrtu = sqrt(uround), small = 1. / hmax;
-	double ynrm = 0., vnrm = 0., sprad, sigma, sigmal, dynrm, dfnrm;
+	double ynrm = 0., vnrm = 0., sigma, sigmal, dynrm, dfnrm;
 	unsigned i, iter, index;
 
 	if (iwork[5] == 0)
