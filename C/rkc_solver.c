@@ -185,14 +185,13 @@ static void step_tsrkc2(const unsigned n,
 	const double x1, const double h,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m,
-	const double w, const double beta, const double gamma, const double acosht,
+	const double w, const double beta, const double gamma, const double acoshtds,
 	const FcnEqDiff f,
 	double* y2, double* yjm1, double* yjm2)
 {
 	double* yswap;
 	double* res = y2;
 	const double hbeta = h * beta;
-	const double acoshtds = acosht / m;
 	double coshims = 1, coshi = w, tim1wdtiw;
 	double temp1 = hbeta / w, temp2, temp3;
 	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
@@ -240,7 +239,7 @@ static void step_tsrkc3(const unsigned n,
 	const double x1, const double h,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m,
-	const double w, const double acosht,
+	const double w, const double acoshtds,
 	const double beta, const double deltadchi,
 	const double gamma, const double chi,
 	const FcnEqDiff f,
@@ -248,7 +247,7 @@ static void step_tsrkc3(const unsigned n,
 {
 	double* yswap;
 	double* res = y2;
-	const double hbeta = h * beta, acoshtds = acosht / m;
+	const double hbeta = h * beta;
 	const double chim1 = chi - 1;
 	double coshims = 1, coshi = w, tim1wdtiw;
 	double temp1 = chi * hbeta / w, temp2, temp3;
@@ -293,9 +292,8 @@ static void step_tsrkc3(const unsigned n,
 }
 
 
-static double calc_chi(const unsigned mdeg, const double w, const double acosht, const double d3tsw)
+static double calc_chi(const unsigned mdeg, const double acoshtds)
 {
-	const double acoshtds = acosht / mdeg;
 	double coshsmi, coshi, sinhsmi, sinhi;
 
 	unsigned smi;
@@ -312,7 +310,7 @@ static double calc_chi(const unsigned mdeg, const double w, const double acosht,
 	}
 
 	const unsigned sd2 = (mdeg - 1) / 2;
-	for (unsigned i = 1; i <= sd2; i++)
+	for (unsigned i = sd2; i >= 1; i--)
 	{
 		smi = mdeg - i;
 
@@ -324,7 +322,7 @@ static double calc_chi(const unsigned mdeg, const double w, const double acosht,
 		sumbc2 += sinhsmi * sinhi * (smi * smi * sinhsmi / coshsmi + i * i * sinhi / coshi);
 	}
 
-	return d3tsw * pow(sinh(acoshtds), 3) / (6 * sumbc2);
+	return pow(sinh(acoshtds), 3) / (6 * sumbc2);
 }
 
 
@@ -343,7 +341,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 	double hmin = 10. * uround * fmax(fabs(x), hmax);
 	double absh, h, abshold, est, sprad, wt, at, err, errold, fac, temp, ci;
 	double q, onemq, onepq, onepq2, s, s2, w, w2, w2m1, dtsw, d2tsw, d3tsw;
-	double alpha, beta, gamma, delta, chi;
+	double alpha, beta, gamma, delta, chi, acoshtds;
 	unsigned i, m, mold = 0;
 
 	double* yn = &work[0];
@@ -620,14 +618,15 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			{
 				s = (double)m;
 				s2 = s * s;
-				w = cosh(acosht / s);
+				acoshtds = acosht / s;
+				w = cosh(acoshtds);
 				w2 = w * w;
 				w2m1 = w2 - 1;
 				dtsw = s * sinh(acosht) / sqrt(w2m1);
 				d2tsw = (s2 * tsw - w * dtsw) / w2m1;
 				d3tsw = ((1 + 2 * w2 + s2 * w2m1) * dtsw - 3 * s2 * w * tsw) / (w2m1 * w2m1);
 
-				chi = calc_chi(m, w, acosht, d3tsw);
+				chi = d3tsw * calc_chi(m, acoshtds);
 			}
 
 			beta = (onemq * d2tsw + sqrt(pow(onemq * d2tsw, 2) + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
@@ -636,7 +635,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			delta = alpha * tsw / beta;
 
 			h = tdir * absh;
-			step_tsrkc3(n, x, h, yold, yn, fn, m, w, acosht, beta, delta / chi, gamma, chi, f, y, vtemp1, vtemp2);
+			step_tsrkc3(n, x, h, yold, yn, fn, m, w, acoshtds, beta, delta / chi, gamma, chi, f, y, vtemp1, vtemp2);
 		}
 		else if (method == 1) // TSRKC2
 		{
@@ -655,7 +654,8 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			if (m != mold)
 			{
 				s = (double)m;
-				w = cosh(acosht / s);
+				acoshtds = acosht / s;
+				w = cosh(acoshtds);
 				w2m1 = w * w - 1;
 				dtsw = s * sinh(acosht) / sqrt(w2m1);
 				d2tsw = (s * s * tsw - w * dtsw) / w2m1;
@@ -665,7 +665,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			gamma = (1 + q) * tsw / (q * tsw + beta * dtsw);
 
 			h = tdir * absh;
-			step_tsrkc2(n, x, h, yold, yn, fn, m, w, beta, gamma, acosht, f, y, vtemp1, vtemp2);
+			step_tsrkc2(n, x, h, yold, yn, fn, m, w, beta, gamma, acoshtds, f, y, vtemp1, vtemp2);
 		}
 
 		hmin = 10. * uround * fmax(fabs(x), fabs(x + h));
