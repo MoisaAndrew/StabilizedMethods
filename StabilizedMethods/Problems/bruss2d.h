@@ -24,7 +24,7 @@ struct Bruss2dParams : ProblemParams
 		const double ans = sqrt(N_sqr);
 		const unsigned N = (unsigned)(ans + 0.5);
 
-		double *y0 = (double*)malloc(n * sizeof(double));
+		double* y0 = (double*)malloc(n * sizeof(double));
 		for (unsigned j = 0; j < N; j++) {
 			const double yy = j / ans;
 			for (unsigned i = 0; i < N; i++) {

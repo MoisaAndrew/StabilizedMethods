@@ -293,38 +293,38 @@ static void step_tsrkc3(const unsigned n,
 }
 
 
-static double calc_chi(const double tsw, const unsigned mdeg, const double q,
-	const double w, const double acosht,
-	const double beta, const double delta, const double gamma)
+static double calc_chi(const unsigned mdeg, const double w, const double acosht, const double d3tsw)
 {
-	const double acoshtds = acosht / mdeg, sinhacoshtds = sinh(acoshtds);
-	double coshims = 1, coshi = w, tim1wdtiw;
+	const double acoshtds = acosht / mdeg;
+	double coshsmi, coshi, sinhsmi, sinhi;
 
-	double sumbc2 = 0, ci3 = 0, ci2 = beta / w, ci1, m;
+	unsigned smi;
+	double sumbc2 = 0;
 
-	double b = sinh((mdeg - 1) * acoshtds) * w / sinhacoshtds;
-
-	sumbc2 += b * ci2 * ci2;
-
-	for (unsigned i = 2; i < mdeg; i++)
+	if (mdeg % 2 == 0)
 	{
-		coshims = coshi;
-		coshi = cosh(i * acoshtds);
-		tim1wdtiw = coshims / coshi;
-		m = 2 * w * tim1wdtiw;
+		smi = mdeg / 2;
 
-		ci1 = m * ci2 + (1 - m) * ci3 + 2 * beta * tim1wdtiw;
-		b = sinh((mdeg - i) * acoshtds) * coshi / sinhacoshtds;
+		coshsmi = cosh(smi * acoshtds);
+		sinhsmi = sinh(smi * acoshtds);
 
-		sumbc2 += b * ci1 * ci1;
-
-		ci3 = ci2;
-		ci2 = ci1;
+		sumbc2 += sinhsmi * sinhsmi * (smi * smi * sinhsmi / coshsmi);
 	}
 
-	sumbc2 *= 6 * beta * delta / tsw;
+	const unsigned sd2 = (mdeg - 1) / 2;
+	for (unsigned i = 1; i <= sd2; i++)
+	{
+		smi = mdeg - i;
 
-	return (1 + gamma * pow(q, 3)) / sumbc2;
+		coshi = cosh(i * acoshtds);
+		sinhi = sinh(i * acoshtds);
+		coshsmi = cosh(smi * acoshtds);
+		sinhsmi = sinh(smi * acoshtds);
+
+		sumbc2 += sinhsmi * sinhi * (smi * smi * sinhsmi / coshsmi + i * i * sinhi / coshi);
+	}
+
+	return d3tsw * pow(sinh(acoshtds), 3) / (6 * sumbc2);
 }
 
 
@@ -626,13 +626,14 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				dtsw = s * sinh(acosht) / sqrt(w2m1);
 				d2tsw = (s2 * tsw - w * dtsw) / w2m1;
 				d3tsw = ((1 + 2 * w2 + s2 * w2m1) * dtsw - 3 * s2 * w * tsw) / (w2m1 * w2m1);
+
+				chi = calc_chi(m, w, acosht, d3tsw);
 			}
 
 			beta = (onemq * d2tsw + sqrt(pow(onemq * d2tsw, 2) + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
 			alpha = onepq / (q * dtsw + beta * d2tsw);
 			gamma = (alpha * dtsw - 1) / q;
 			delta = alpha * tsw / beta;
-			chi = calc_chi(tsw, m, q, w, acosht, beta, delta, gamma);
 
 			h = tdir * absh;
 			step_tsrkc3(n, x, h, yold, yn, fn, m, w, acosht, beta, delta / chi, gamma, chi, f, y, vtemp1, vtemp2);
