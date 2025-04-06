@@ -8,7 +8,7 @@ void solout_h(const unsigned n, const double xold, const double x, const double*
 	const unsigned buffer_length = 25;
 	char* buffer = (char*)malloc(buffer_length * sizeof(char));
 
-	sprintf(buffer, "{%1.3f,%1.2e},", xold, x - xold);
+	snprintf(buffer, buffer_length, "{%1.3f,%1.2e},", xold, x - xold);
 	to_wolfram_style(buffer_length, buffer);
 	printf("%s", buffer);
 

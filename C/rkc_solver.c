@@ -715,7 +715,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		}
 		err = sqrt(err / n);
 
-		if (!isfinited(err))
+		if (!isfinite(err))
 		{
 			return 4;
 		}

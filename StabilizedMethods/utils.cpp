@@ -96,25 +96,25 @@ void print_report(const unsigned report_length, double* report[2])
 	const unsigned buffer_length = 25;
 	char* buffer = (char*)malloc(buffer_length * sizeof(char));
 	
-	if (isfinited(report[0][0]) && report[0][0] > 0)
+	if (isfinite(report[0][0]) && report[0][0] > 0)
 	{
-		sprintf(buffer, "{{%1.2e,%.3f}", report[0][0], report[1][0]);
+		snprintf(buffer, buffer_length, "{{%1.2e,%.3f}", report[0][0], report[1][0]);
 	}
 	else
 	{
-		sprintf(buffer, "{{NaN,%.3f}", report[1][0]);
+		snprintf(buffer, buffer_length, "{{NaN,%.3f}", report[1][0]);
 	}
 	to_wolfram_style(buffer_length, buffer);
 	printf("%s", buffer);
 	for (unsigned i = 1; i < report_length; i++)
 	{
-		if (isfinited(report[0][i]) && report[0][i] > 0)
+		if (isfinite(report[0][i]) && report[0][i] > 0)
 		{
-			sprintf(buffer, ",{%1.2e,%.3f}", report[0][i], report[1][i]);
+			snprintf(buffer, buffer_length, ",{%1.2e,%.3f}", report[0][i], report[1][i]);
 		}
 		else
 		{
-			sprintf(buffer, ",{NaN,%.3f}", report[1][i]);
+			snprintf(buffer, buffer_length, ",{NaN,%.3f}", report[1][i]);
 		}
 		to_wolfram_style(buffer_length, buffer);
 		printf("%s", buffer);
