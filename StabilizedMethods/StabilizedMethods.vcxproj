@@ -145,10 +145,12 @@
     <ClCompile Include="Problems\bruss.cpp" />
     <ClCompile Include="Problems\bruss2d.cpp" />
     <ClCompile Include="Problems\burgers.cpp" />
-    <ClCompile Include="Problems\comb.cpp" />
+    <ClCompile Include="Problems\comb2d.cpp" />
+    <ClCompile Include="Problems\comb3d.cpp" />
     <ClCompile Include="Problems\cusp.cpp" />
     <ClCompile Include="Problems\finag.cpp" />
     <ClCompile Include="Problems\heat.cpp" />
+    <ClCompile Include="Problems\heat3d.cpp" />
     <ClCompile Include="Problems\hires.cpp" />
     <ClCompile Include="Problems\raddiff.cpp" />
     <ClCompile Include="Problems\raddiff2d.cpp" />
@@ -164,10 +166,12 @@
     <ClInclude Include="Problems\bruss2d.h" />
     <ClInclude Include="Problems\bruss.h" />
     <ClInclude Include="Problems\burgers.h" />
-    <ClInclude Include="Problems\comb.h" />
+    <ClInclude Include="Problems\comb2d.h" />
+    <ClInclude Include="Problems\comb3d.h" />
     <ClInclude Include="Problems\cusp.h" />
     <ClInclude Include="Problems\finag.h" />
     <ClInclude Include="Problems\heat.h" />
+    <ClInclude Include="Problems\heat3d.h" />
     <ClInclude Include="Problems\hires.h" />
     <ClInclude Include="Problems\raddiff.h" />
     <ClInclude Include="Problems\raddiff2d.h" />

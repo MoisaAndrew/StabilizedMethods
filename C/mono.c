@@ -1,4 +1,4 @@
-//	Version of March 2025
+//	Version of April 2025
 
 
 #include "methods_common.h"
@@ -114,7 +114,7 @@ static double mono_rho(const unsigned n, const double x, const FcnEqDiff f,
 static void step_mono(const unsigned n, const double x, const FcnEqDiff f,
 	const double* yn, const double* fn, const double h, 
 	const unsigned m, const double acoshw0, const double w1,
-	const double b, const double c, const double d,
+	const double c, const double d,
 	double* y, double* yjm1, double* yjm2)
 {
 	unsigned i;
@@ -170,7 +170,7 @@ static void step_mono(const unsigned n, const double x, const FcnEqDiff f,
 	onemmumnu = 1. - mu - nu;
 	for (i = 0; i < n; i++)
 	{
-		res[i] = onemmumnu * yn[i] + mu * y[i] + nu * yjm2[i] + b * h * fn[i];
+		res[i] = onemmumnu * yn[i] + mu * y[i] + nu * yjm2[i] + bjm1 * h * fn[i];
 	}
 }
 
@@ -1142,7 +1142,7 @@ static int mono_core(const unsigned n, double x, const double xend, double* y,
 	const double errpow = 0.5;
 	double hmin = 10. * uround * fmax(fabs(x), hmax);
 	double absh, h, abshold, est, sprad, wt, at, err, errold, fac, temp, ci;
-	double acoshw0, w1, b, c, d;
+	double acoshw0, w1, c, d;
 	unsigned i, m;
 
 	double* yn = &work[0];
@@ -1262,10 +1262,9 @@ static int mono_core(const unsigned n, double x, const double xend, double* y,
 
 		c = 0.5 / (m * w1 * (1 + cosh((m - 1) * acoshw0)));
 		d = c * m / (m - 2);
-		b = d * (2 * m - 4) * w1;
 
 		h = tdir * absh;
-		step_mono(n, x, f, yn, fn, h, m, acoshw0, w1, b, c, d, y, vtemp1, vtemp2);
+		step_mono(n, x, f, yn, fn, h, m, acoshw0, w1, c, d, y, vtemp1, vtemp2);
 
 		hmin = 10. * uround * fmax(fabs(x), fabs(x + h));
 		iwork[9] = m > iwork[9] ? m : iwork[9];

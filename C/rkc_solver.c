@@ -1,4 +1,4 @@
-//	Version of March 2025
+//	Version of April 2025
 
 
 #include "methods_common.h"
@@ -322,7 +322,7 @@ static double calc_chi(const unsigned mdeg, const double acoshtds)
 		sumbc2 += sinhsmi * sinhi * (smi * smi * sinhsmi / coshsmi + i * i * sinhi / coshi);
 	}
 
-	return pow(sinh(acoshtds), 3) / (6 * sumbc2);
+	return pow(sinhi, 3) / (6 * sumbc2);
 }
 
 

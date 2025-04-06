@@ -183,7 +183,7 @@ int main()
     // tol_max = 10 ^ fromtolp
     const double fromtolp = -1.0;
     // tol_min = 10 ^ totolp
-    const double totolp = -12.0;
+    const double totolp = -8.0;
     // tol = 10 ^ (fromtolp - i * tolpstep)
     const double tolpstep = 1.0;
 

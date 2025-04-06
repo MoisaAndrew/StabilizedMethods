@@ -35,7 +35,7 @@
     <ClCompile Include="Problems\burgers.cpp">
       <Filter>Source files\Problems</Filter>
     </ClCompile>
-    <ClCompile Include="Problems\comb.cpp">
+    <ClCompile Include="Problems\comb2d.cpp">
       <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\cusp.cpp">
@@ -57,6 +57,12 @@
       <Filter>Source files\Problems</Filter>
     </ClCompile>
     <ClCompile Include="Problems\raddiff.cpp">
+      <Filter>Source files\Problems</Filter>
+    </ClCompile>
+    <ClCompile Include="Problems\heat3d.cpp">
+      <Filter>Source files\Problems</Filter>
+    </ClCompile>
+    <ClCompile Include="Problems\comb3d.cpp">
       <Filter>Source files\Problems</Filter>
     </ClCompile>
   </ItemGroup>
@@ -85,7 +91,7 @@
     <ClInclude Include="Problems\burgers.h">
       <Filter>Header files\Problems</Filter>
     </ClInclude>
-    <ClInclude Include="Problems\comb.h">
+    <ClInclude Include="Problems\comb2d.h">
       <Filter>Header files\Problems</Filter>
     </ClInclude>
     <ClInclude Include="Problems\cusp.h">
@@ -107,6 +113,12 @@
       <Filter>Header files\Problems</Filter>
     </ClInclude>
     <ClInclude Include="Problems\raddiff2d.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\heat3d.h">
+      <Filter>Header files\Problems</Filter>
+    </ClInclude>
+    <ClInclude Include="Problems\comb3d.h">
       <Filter>Header files\Problems</Filter>
     </ClInclude>
   </ItemGroup>
