@@ -5,7 +5,7 @@ struct Heat3dParams : ProblemParams
 {
 	Heat3dParams()
 	{
-		nDefault = 59319;
+		nDefault = 39 * 39 * 39;
 
 		x0 = 0;
 		h0 = 1e-5;

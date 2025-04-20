@@ -85,7 +85,7 @@ static void fheat3d(const unsigned* n, const double* x, const double* y, double*
 						ykp1ji - 2 * y[k * ns_sqr + j * ns + i] + ykm1ji
 					) / (h * h) 
 					+
-					312.5 * pow(cosh(5 * (xx + 2 * yy + 1.5 * zz - *x - 0.5)), -2) * tanh(5 * (xx + 2 * yy + 1.5 * zz - *x - 0.5));
+					pow(cosh(5 * (xx + 2 * yy + 1.5 * zz - *x - 0.5)), -2) * (-5 + 362.5 * tanh(5 * (xx + 2 * yy + 1.5 * zz - *x - 0.5)));
 			}
 		}
 	}
