@@ -238,91 +238,79 @@ static void step_tsrkc2(const unsigned n,
 static void step_tsrkc3(const unsigned n,
 	const double x1, const double h,
 	const double* y0, const double* y1, const double* f1,
-	const unsigned m,
-	const double w, const double acoshtds,
-	const double beta, const double deltadchi,
-	const double gamma, const double chi,
-	const FcnEqDiff f,
-	double* y2, double* yjm1, double* yjm2)
+	const unsigned m, const double w0, const double acoshtds,
+	const double w1, const double alpha, const double gamma,
+	const FcnEqDiff f, double* y2, double* yjm1, double* yjm2)
 {
-	double* yswap;
-	double* res = y2;
-	const double hbeta = h * beta;
-	const double chim1 = chi - 1;
-	double coshims = 1, coshi = w, tim1wdtiw;
-	double temp1 = chi * hbeta / w, temp2, temp3;
-	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
-	unsigned i, j;
+	unsigned i;
+	double* swap, * res = y2;
+
+	double bjm1 = 0.25 * sinh((m - 2) * acoshtds) / sinh((m - 1) * acoshtds);
+	double bj = 15. / (64. * w0 * w0);
+	double bjm2 = bjm1;
 
 	memcpy(yjm2, y1, n * sizeof(double));
-	for (j = 0; j < n; j++)
+	double mus = w1 * bjm1;
+	for (i = 0; i < n; i++)
 	{
-		yjm1[j] = yjm2[j] + temp1 * f1[j];
+		yjm1[i] = yjm2[i] + h * mus * f1[i];
 	}
+	double thjm2 = 0., thjm1 = mus;
+	double zjm1 = w0, zjm2 = 1.;
+	double dzjm1 = 1., dzjm2 = 0.;
+	double d2zjm1 = 0., d2zjm2 = 0.;
 
-	for (i = 2; i <= m; i++)
+	double zj = 2. * w0 * zjm1 - zjm2;
+	double dzj = 2. * w0 * dzjm1 - dzjm2 + 2. * zjm1;
+	double d2zj = 2. * w0 * d2zjm1 - d2zjm2 + 4. * dzjm1;
+	double ajm1, mu, nu, thj, cj;
+	for (unsigned j = 2; j <= m; j++)
 	{
-		coshims = coshi;
-		coshi = cosh(i * acoshtds);
-		tim1wdtiw = coshims / coshi;
-		temp1 = 2 * hbeta * tim1wdtiw;
-		temp2 = 2 * w * tim1wdtiw;
-		temp3 = 1 - temp2;
-		f(&n, &ci1, yjm1, y2);
-		ci1 = chi * temp1 + temp2 * ci2 + temp3 * ci3;
-		for (j = 0; j < n; j++)
+		ajm1 = 1. - zjm1 * bjm1;
+		mu = 2. * w0 * bj / bjm1;
+		nu = -bj / bjm2;
+		mus = mu * w1 / w0;
+
+		cj = x1 + h * thjm1;
+		f(&n, &cj, yjm1, y2);
+		for (i = 0; i < n; i++)
 		{
-			y2[j] = temp1 * (y2[j] + chim1 * f1[j]) + temp2 * yjm1[j] + temp3 * yjm2[j];
+			y2[i] = mu * yjm1[i] + nu * yjm2[i] + (1. - mu - nu) * y1[i] + h * mus * (y2[i] - ajm1 * f1[i]);
 		}
+		thj = mu * thjm1 + nu * thjm2 + mus * (1. - ajm1);
 
-		yswap = yjm2;
-		yjm2 = yjm1;
-		yjm1 = y2;
-		y2 = yswap;
+		if (j < m)
+		{
+			swap = yjm2;
+			yjm2 = yjm1;
+			yjm1 = y2;
+			y2 = swap;
 
-		ci3 = ci2;
-		ci2 = ci1;
+			thjm2 = thjm1;
+			thjm1 = thj;
+			bjm2 = bjm1;
+			bjm1 = bj;
+			zjm2 = zjm1;
+			zjm1 = zj;
+			dzjm2 = dzjm1;
+			dzjm1 = dzj;
+			d2zjm2 = d2zjm1;
+			d2zjm1 = d2zj;
+
+			zj = 2. * w0 * zjm1 - zjm2;
+			dzj = 2. * w0 * dzjm1 - dzjm2 + 2. * zjm1;
+			d2zj = 2. * w0 * d2zjm1 - d2zjm2 + 4. * dzjm1;
+
+			bj = d2zj / (dzj * dzj);
+		}
 	}
 
-	temp2 = 1 - gamma - deltadchi;
-	for (j = 0; j < n; j++)
+	bj = alpha / (bj * w1);
+	mu = 1 - gamma - bj;
+	for (i = 0; i < n; i++)
 	{
-		res[j] = temp2 * y1[j] + gamma * y0[j] + deltadchi * yjm1[j];
+		res[i] = mu * y1[i] + gamma * y0[i] + bj * y2[i];
 	}
-}
-
-
-static double calc_chi(const unsigned mdeg, const double acoshtds)
-{
-	double coshsmi, coshi, sinhsmi, sinhi;
-
-	unsigned smi;
-	double sumbc2 = 0;
-
-	if (mdeg % 2 == 0)
-	{
-		smi = mdeg / 2;
-
-		coshsmi = cosh(smi * acoshtds);
-		sinhsmi = sinh(smi * acoshtds);
-
-		sumbc2 += sinhsmi * sinhsmi * (smi * smi * sinhsmi / coshsmi);
-	}
-
-	const unsigned sd2 = (mdeg - 1) / 2;
-	for (unsigned i = sd2; i >= 1; i--)
-	{
-		smi = mdeg - i;
-
-		coshi = cosh(i * acoshtds);
-		sinhi = sinh(i * acoshtds);
-		coshsmi = cosh(smi * acoshtds);
-		sinhsmi = sinh(smi * acoshtds);
-
-		sumbc2 += sinhsmi * sinhi * (smi * smi * sinhsmi / coshsmi + i * i * sinhi / coshi);
-	}
-
-	return pow(sinhi, 3) / (6 * sumbc2);
 }
 
 
@@ -341,7 +329,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 	double hmin = 10. * uround * fmax(fabs(x), hmax);
 	double absh, h, abshold, est, sprad, wt, at, err, errold, fac, temp, ci;
 	double q, onemq, onepq, onepq2, s, s2, w, w2, w2m1, dtsw, d2tsw, d3tsw;
-	double alpha, beta, gamma, delta, chi, acoshtds;
+	double alpha, beta, gamma, acoshtds;
 	unsigned i, m, mold = 0;
 
 	double* yn = &work[0];
@@ -625,17 +613,14 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				dtsw = s * sinh(acosht) / sqrt(w2m1);
 				d2tsw = (s2 * tsw - w * dtsw) / w2m1;
 				d3tsw = ((1 + 2 * w2 + s2 * w2m1) * dtsw - 3 * s2 * w * tsw) / (w2m1 * w2m1);
-
-				chi = d3tsw * calc_chi(m, acoshtds);
 			}
 
 			beta = (onemq * d2tsw + sqrt(pow(onemq * d2tsw, 2) + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
 			alpha = onepq / (q * dtsw + beta * d2tsw);
 			gamma = (alpha * dtsw - 1) / q;
-			delta = alpha * tsw / beta;
 
 			h = tdir * absh;
-			step_tsrkc3(n, x, h, yold, yn, fn, m, w, acoshtds, beta, delta / chi, gamma, chi, f, y, vtemp1, vtemp2);
+			step_tsrkc3(n, x, h, yold, yn, fn, m, w, acoshtds, beta, alpha, gamma, f, y, vtemp1, vtemp2);
 		}
 		else if (method == 1) // TSRKC2
 		{
