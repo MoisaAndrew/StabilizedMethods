@@ -13,7 +13,7 @@ struct Comb3dParams : ProblemParams
 {
 	Comb3dParams()
 	{
-		nDefault = 128000;
+		nDefault = 2 * 40 * 40 * 40;
 
 		x0 = 0;
 		h0 = 1e-7;

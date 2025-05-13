@@ -16,7 +16,9 @@ struct ProblemParams
 	bool isRhoDefined;
 	bool isJacConst;
 
-	virtual double* y0(const unsigned n) const { return 0; };
+	virtual double* y0(const unsigned n) const { return NULL; };
+
+	virtual double* y_exact(const unsigned n) const { return NULL; };
 };
 
 

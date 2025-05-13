@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 
-double norm(const unsigned n, const double* v)
+double euclidean_norm(const unsigned n, const double* v)
 {
 	double norm = 0.;
 	for (unsigned j = 0; j < n; j++)
@@ -12,6 +12,21 @@ double norm(const unsigned n, const double* v)
 		norm += v[j] * v[j];
 	}
 	return sqrt(norm);
+}
+
+
+double maximum_norm(const unsigned n, const double* v)
+{
+	double norm = 0., absv;
+	for (unsigned j = 0; j < n; j++)
+	{
+		absv = fabs(v[j]);
+		if (absv > norm)
+		{
+			norm = absv;
+		}
+	}
+	return norm;
 }
 
 
@@ -25,7 +40,7 @@ double get_absolute_error(const unsigned n, const double* model_solution, const 
 		errvec[i] = model_solution[i] - y[i];
 	}
 
-	const double error = norm(n, errvec);
+	const double error = maximum_norm(n, errvec);
 
 	free(errvec);
 
@@ -43,7 +58,7 @@ double get_relative_error(const unsigned n, const double* model_solution, const 
 		errvec[i] = (model_solution[i] - y[i]) / model_solution[i];
 	}
 
-	const double error = norm(n, errvec);
+	const double error = maximum_norm(n, errvec);
 
 	free(errvec);
 
@@ -61,13 +76,13 @@ void print_error(const unsigned n, const double* model_solution, const double* y
 		error[i] = model_solution[i] - y[i];
 	}
 
-	printf("aerr = %.2e", norm(n, error));
+	printf("aerr = %.2e", maximum_norm(n, error));
 
 	for (i = 0; i < n; i++)
 	{
 		error[i] /= model_solution[i];
 	}
-	printf(", rerr = %.2e", norm(n, error));
+	printf(", rerr = %.2e", maximum_norm(n, error));
 
 	free(error);
 }
