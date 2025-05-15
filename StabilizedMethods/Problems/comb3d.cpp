@@ -99,19 +99,19 @@ static void fcomb3d(const unsigned* n, const double* x, const double* y, double*
 						ckjip1 - 2 * ckji + ckjim1 +
 						ckjp1i - 2 * ckji + ckjm1i +
 						ckp1ji - 2 * ckji + ckm1ji
-						) / (h * h)
+					) / (h * h)
 					-
-					D * ckji * exp(-delta / tkji);
+					R * ckji * exp(delta - delta / tkji) / (alpha * delta);
 				fy[k2NN + j2N + i + 1] =
-					1.1111111111111111 * (
+					(
 						(
 							tkjip1 - 2 * tkji + tkjim1 +
 							tkjp1i - 2 * tkji + tkjm1i +
 							tkp1ji - 2 * tkji + tkm1ji
-							) / (h * h)
+						) / (h * h)
 						+
-						alpha * D * ckji * exp(-delta / tkji)
-						);
+						R * ckji * exp(delta - delta / tkji) / delta
+					) / L;
 			}
 		}
 	}
