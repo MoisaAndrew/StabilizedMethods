@@ -8,6 +8,7 @@
 struct ProblemParams
 {
 	unsigned nDefault;
+	unsigned nFine; // for discretization errors computation
 
 	double x0;
 	double h0;
@@ -19,6 +20,8 @@ struct ProblemParams
 	virtual double* y0(const unsigned n) const { return NULL; };
 
 	virtual double* y_exact(const unsigned n) const { return NULL; };
+
+	virtual double* remap_solution(const unsigned nFrom, const unsigned nTo, const double* y) const { return NULL; };
 };
 
 

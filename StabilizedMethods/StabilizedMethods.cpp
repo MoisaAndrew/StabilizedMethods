@@ -154,43 +154,69 @@ int main()
     FcnEqDiff fcn;
     Rho rho;
 
-    double rtol, atol;
+    const double rtol = 1.0e-10, atol = 1.0e-10;
 
     // problem to test
     get_heat3d(&params, &fcn, &rho);
     unsigned iwork[12] = { params->isRhoDefined, params->isJacConst, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
+    const bool printspatialerrors = false;
     // print stats like number of function evaluations, number of steps, ...
-    const bool printstats = true;
+    const bool printstats = false;
     // print work/precision report
     const bool printreport = true;
 
     double* work = (double*)malloc(8 * params->nDefault * sizeof(double));
     int idid;
-    double* modelsolution = params->y_exact(params->nDefault);
 
     double x = params->x0;
     double h = params->h0;
-    const double* y0 = params->y0(params->nDefault);
+
+    double* modelsolution = NULL;
     
+    if (printspatialerrors)
+    {
+        modelsolution = params->y_exact(params->nDefault);
+        if (modelsolution == NULL)
+        {
+            double* u = params->y0(params->nFine);
+            work = (double*)realloc(work, 8 * params->nFine * sizeof(double));
+
+            ROCK4F(&params->nFine, &x, &params->xend, &h, u, fcn, rho, &atol, &rtol, work, iwork, &idid);
+
+            modelsolution = params->remap_solution(params->nFine, params->nDefault, u);
+
+            free(u);
+
+            x = params->x0;
+            h = params->h0;
+        }
+    }
+
+    const double* y0 = params->y0(params->nDefault);
+
     double* y = (double*)malloc(params->nDefault * sizeof(double));
     memcpy(y, y0, params->nDefault * sizeof(double));
     
-    rtol = 1.0e-10, atol = 1.0e-10;
     ROCK4F(&params->nDefault, &x, &params->xend, &h, y, fcn, rho, &atol, &rtol, work, iwork, &idid);
     
     if (idid == 1)
     {
+        if (printspatialerrors)
+        {
+            print_error(params->nDefault, modelsolution, y);
+            printf(", ");
+        }
+        printf("maxspr= %i minspr= %i\r\n\r\n", iwork[10], iwork[11]);
+
         modelsolution = (double*)malloc(params->nDefault * sizeof(double));
         memcpy(modelsolution, y, params->nDefault * sizeof(double));
-
-        printf("maxspr= %i minspr= %i\r\n\r\n", iwork[10], iwork[11]);
     }
     
     // tol_max = 10 ^ fromtolp
-    const double fromtolp = 0.0;
+    const double fromtolp = -3.0;
     // tol_min = 10 ^ totolp
-    const double totolp = -5.0;
+    const double totolp = -8.0;
     // tol = 10 ^ (fromtolp - i * tolpstep)
     const double tolpstep = 0.5;
 
