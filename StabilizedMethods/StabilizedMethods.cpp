@@ -19,15 +19,16 @@ enum MethodName
     TSRKC2,
     TSRKC3,
     MONO,
+    VODPK_F,
 };
 
 
 static void run_method_test(
     const ProblemParams params, const enum MethodName method,
     const double fromtolp, const double totolp, const double tolpstep,
-    const double* y0, double* y,
-    const FcnEqDiff fcn, const Rho rho, const double* modelsolution,
-    double* work, unsigned iwork[12], double* report[2],
+    const double* y0, double* y, const double* modelsolution,
+    const Fcn fcn, const Rho rho, const Jac jac, const PSol psol,
+    double* work, unsigned iwork[31], double* report[2],
     const bool printstats, const bool printreport, const unsigned reportlength)
 {
     using namespace std::chrono;
@@ -40,11 +41,26 @@ static void run_method_test(
 
     if (method == RKC_F)
     {
-        i = iwork[2];
-        iwork[1] = iwork[0];
-        iwork[2] = iwork[1];
-        iwork[0] = 1 - i;
+        iwork[0] = 1;
+        iwork[1] = params.isRhoDefined;
+        iwork[2] = params.isSpradConst;
+        iwork[3] = 0; iwork[4] = 0; iwork[5] = 0;
     }
+    else if (method != VODPK_F)
+    {
+        iwork[0] = params.isRhoDefined;
+        iwork[1] = params.isSpradConst;
+        iwork[2] = 0; iwork[3] = 0; iwork[4] = 0; iwork[5] = 0;
+    }
+    else
+    {
+        iwork[0] = params.nDefault; iwork[1] = 0; 
+        iwork[2] = 1; iwork[3] = 1;
+        iwork[4] = 0; iwork[5] = 10000;
+    }
+    iwork[6] = 0; iwork[7] = 0; iwork[8] = 0;
+
+    work[4] = 0; work[5] = 0; work[6] = 0; work[7] = 0;
 
     i = 0;
     for (double tolp = fromtolp; tolp >= totolp; tolp -= tolpstep)
@@ -87,6 +103,17 @@ static void run_method_test(
         case MONO:
             idid = mono(params.nDefault, x, params.xend, y, fcn, rho, solout_h, &atol, rtol, iwork);
             break;
+        case VODPK_F:
+            const unsigned itol = 1;
+            const unsigned itask = 1;
+            const unsigned iopt = 1;
+            const unsigned liw = 31;
+            const unsigned lrw = 61 + 18 * params.nDefault;
+            const unsigned mf = 21;
+            idid = 1;
+            VODPK(fcn, &params.nDefault, y, &x, &params.xend, &itol, &rtol, &atol,
+                &itask, &idid, &iopt, work, &lrw, iwork, &liw, jac, psol, &mf);
+            break;
         }
         
 
@@ -94,13 +121,21 @@ static void run_method_test(
 
         time_span = (params.nDefault < 50000 ? 1000 : 1) * duration_cast<duration<double>>(tf - ts).count();
 
-        if (idid == 1)
+        if (idid == 1 || (idid == 2 && method == VODPK_F))
         {
             if (printstats)
             {
                 printf("atol = %1.2e, rtol = %1.2e\r\n", atol, rtol);
-                printf("fcn= %i step= %i accpt= %i rejct= %i fspr= %i stg= %i\r\n",
-                    iwork[4], iwork[5], iwork[6], iwork[7], iwork[8], iwork[9]);
+                if (method != VODPK_F)
+                {
+                    printf("fcn= %i step= %i accpt= %i rejct= %i fspr= %i stg= %i\r\n",
+                        iwork[4], iwork[5], iwork[6], iwork[7], iwork[8], iwork[9]);
+                }
+                else
+                {
+                    printf("fcn= %i step= %i jac= %i psol= %i nonlin= %i conv= %i\r\n",
+                        iwork[11], iwork[10], iwork[12], iwork[23], iwork[19], iwork[20]);
+                }
 
                 if (modelsolution != NULL)
                 {
@@ -137,28 +172,22 @@ static void run_method_test(
     {
         print_report(reportlength, report);
     }
-
-    if (method == RKC_F)
-    {
-        i = iwork[0];
-        iwork[0] = iwork[1];
-        iwork[1] = iwork[2];
-        iwork[2] = 1 - i;
-    }
 }
 
 
 int main()
 {
     ProblemParams* params;
-    FcnEqDiff fcn;
+    Fcn fcn;
     Rho rho;
+    Jac jac;
+    PSol psol;
 
     const double rtol = 1.0e-10, atol = 1.0e-10;
 
     // problem to test
-    get_heat3d(&params, &fcn, &rho);
-    unsigned iwork[12] = { params->isRhoDefined, params->isJacConst, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    get_heat3d(&params, &fcn, &rho, &jac, &psol);
+    unsigned iwork[31] = { params->isRhoDefined, params->isSpradConst };
 
     const bool printspatialerrors = false;
     // print stats like number of function evaluations, number of steps, ...
@@ -166,7 +195,7 @@ int main()
     // print work/precision report
     const bool printreport = true;
 
-    double* work = (double*)malloc(8 * params->nDefault * sizeof(double));
+    double* work = (double*)malloc((61 + 18 * params->nDefault) * sizeof(double));
     int idid;
 
     double x = params->x0;
@@ -180,7 +209,10 @@ int main()
         if (modelsolution == NULL)
         {
             double* u = params->y0(params->nFine);
-            work = (double*)realloc(work, 8 * params->nFine * sizeof(double));
+            if (8 * params->nFine > 61 + 18 * params->nDefault)
+            {
+                work = (double*)realloc(work, 8 * params->nFine * sizeof(double));
+            }
 
             ROCK4F(&params->nFine, &x, &params->xend, &h, u, fcn, rho, &atol, &rtol, work, iwork, &idid);
 
@@ -229,58 +261,60 @@ int main()
     }
 
     
-    // Testing of different methods in a row at one start can lead to a large spread of results.
-    // For more accurate time measurements, it is recommended to comment all the methods except one.
-    // Do not forget to test speed of the methods in Release configuration only.
-    
     /*
     printf("\r\n------------------------------------------rkcf------------------------------------------\r\n");
 
-    run_method_test(*params, RKC_F, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
-        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    run_method_test(*params, RKC_F, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
+        fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
     
     printf("\r\n------------------------------------------rkcc------------------------------------------\r\n");
 
-    run_method_test(*params, RKC_C, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
-        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    run_method_test(*params, RKC_C, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
+        fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     
     
     printf("\r\n-----------------------------------------rock4f-----------------------------------------\r\n");
 
-    run_method_test(*params, ROCK4_F, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
-        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    run_method_test(*params, ROCK4_F, fromtolp, totolp, tolpstep, y0, y, modelsolution,
+        fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     
     /*
     printf("\r\n-----------------------------------------rock2f-----------------------------------------\r\n");
 
-    run_method_test(*params, ROCK2_F, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
-        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    run_method_test(*params, ROCK2_F, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
+        fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
     printf("\r\n-----------------------------------------dumka3-----------------------------------------\r\n");
 
-    run_method_test(*params, DUMKA3, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
-        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    run_method_test(*params, DUMKA3, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
+        fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
     printf("\r\n-----------------------------------------tsrkc2-----------------------------------------\r\n");
     
-    run_method_test(*params, TSRKC2, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
-        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    run_method_test(*params, TSRKC2, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
+        fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
     
     printf("\r\n-----------------------------------------tsrkc3-----------------------------------------\r\n");
     
-    run_method_test(*params, TSRKC3, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
-        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    run_method_test(*params, TSRKC3, fromtolp, totolp, tolpstep, y0, y, modelsolution,
+        fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     
     /*
     printf("\r\n------------------------------------------mono------------------------------------------\r\n");
 
-    run_method_test(*params, MONO, fromtolp, totolp, tolpstep, y0, y, fcn, rho,
-        modelsolution, work, iwork, report, printstats, printreport, reportlength);
+    run_method_test(*params, MONO, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
+        fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
+    
+    printf("\r\n-----------------------------------------vodpk------------------------------------------\r\n");
+
+    run_method_test(*params, VODPK_F, fromtolp, totolp, tolpstep, y0, y, modelsolution,
+        fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
+    
 
     if (printreport)
     {

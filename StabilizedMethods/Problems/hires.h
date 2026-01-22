@@ -12,7 +12,7 @@ struct HiresParams : ProblemParams
 		xend = 421.8122;
 
 		isRhoDefined = false;
-		isJacConst = false;
+		isSpradConst = false;
 	}
 
 	double* y0(const unsigned n) const

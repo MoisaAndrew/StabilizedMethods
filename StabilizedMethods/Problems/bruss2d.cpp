@@ -88,9 +88,28 @@ static void fbruss2d(const unsigned* n, const double* x, const double* y, double
 }
 
 
-void get_bruss2d(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
+static void jacbruss2d(Fcn fcn,
+    const unsigned* n, const double* x, const double* y,
+    const double* yy, const double* rewt, const double* f, const double* ff,
+    const double* hrl1, double* p, int* iwp, int* idid)
+{
+    const unsigned ns_sqr = *n / 2;
+    for (unsigned i = 1; i <= ns_sqr; i++)
+    {
+        double uij = y[i - 1];
+        double vij = y[i + ns_sqr - 1];
+
+        p[i - 1] = 1 - *hrl1 * (2 * uij * vij - 4.4 - 4 * alpha * ns_sqr);
+        p[i + ns_sqr - 1] = 1 + *hrl1 * (uij * uij + 4 * alpha * ns_sqr);
+    }
+}
+
+
+void get_bruss2d(ProblemParams** params, Fcn* fcn, Rho* rho, Jac* jac, PSol* psol)
 {
     *params = new Bruss2dParams();
 
     *fcn = fbruss2d;
+    *jac = jacbruss2d;
+    *psol = psoldiag;
 }

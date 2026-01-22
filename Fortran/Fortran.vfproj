@@ -51,6 +51,7 @@
 			<File RelativePath=".\rkc.f"/>
 			<File RelativePath=".\rock2.f"/>
 			<File RelativePath=".\rock4.f"/>
+			<File RelativePath=".\vodpk.f"/>
 		</Filter>
 	</Files>
 	<Globals/>

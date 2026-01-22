@@ -89,7 +89,7 @@ static void rhoraddiff(const unsigned* n, const double* x, const double* y, doub
 }
 
 
-void get_raddiff(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
+void get_raddiff(ProblemParams** params, Fcn* fcn, Rho* rho, Jac* jac, PSol* psol)
 {
     *params = new RadDiffParams();
 

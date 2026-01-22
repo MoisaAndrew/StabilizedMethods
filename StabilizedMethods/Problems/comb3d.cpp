@@ -118,9 +118,72 @@ static void fcomb3d(const unsigned* n, const double* x, const double* y, double*
 }
 
 
-void get_comb3d(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
+static void jaccomb3d(Fcn fcn,
+	const unsigned* n, const double* x, const double* y,
+	const double* yy, const double* rewt, const double* f, const double* ff,
+	const double* hrl1, double* p, int* iwp, int* idid)
 {
-    *params = new Comb3dParams();
+	const unsigned N = (unsigned)(0.5 + pow(*n / 2, 0.3333333333333333));
+	const unsigned NN = N * N;
+	const double h = 1 / (0.5 + N);
 
-    *fcn = fcomb3d;
+	double ckji, tkji, add;
+
+	unsigned k2NN, j2N, i;
+
+	for (k2NN = 0; k2NN < *n; k2NN += 2 * NN)
+	{
+		if (k2NN == 0)
+		{
+			add = 1;
+		}
+		else
+		{
+			add = 0;
+		}
+
+		for (j2N = 0; j2N < 2 * NN; j2N += 2 * N)
+		{
+			if (j2N == 0)
+			{
+				add++;
+			}
+			else if (j2N == 2 * N)
+			{
+				add--;
+			}
+
+			for (i = 0; i < 2 * N; i += 2)
+			{
+				if (i == 0)
+				{
+					add++;
+				}
+				else if (i == 2)
+				{
+					add--;
+				}
+
+				ckji = y[k2NN + j2N + i];
+				tkji = y[k2NN + j2N + i + 1];
+
+				p[k2NN + j2N + i] = 1 - *hrl1 * ((-6 + add) / (h * h) - R * exp(delta - delta / tkji) / (alpha * delta));
+				p[k2NN + j2N + i + 1] =
+					1 - *hrl1 * (
+						(-6 + add) / (h * h) +
+						R * ckji * exp(delta - delta / tkji) / (tkji * tkji)
+						) / L;
+			}
+		}
+	}
+}
+
+
+void get_comb3d(ProblemParams** params, Fcn* fcn, Rho* rho, Jac* jac, PSol* psol)
+{
+	*params = new Comb3dParams();
+
+	*fcn = fcomb3d;
+	*jac = jaccomb3d;
+	*psol = psoldiag;
 }

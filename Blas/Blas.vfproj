@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectType="typeStaticLibrary" ProjectCreator="Intel Fortran" Keyword="Static Library" Version="11.0" ProjectIdGuid="{443D6832-7AFA-D8EA-3B1F-041C9BC76970}">
+	<Platforms>
+		<Platform Name="Win32"/>
+		<Platform Name="x64"/>
+	</Platforms>
+	<Configurations>
+		<Configuration Name="Debug|Win32" UseCompiler="ifortCompiler" ConfigurationType="typeStaticLibrary">
+			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+			<Tool Name="VFLibrarianTool"/>
+			<Tool Name="VFResourceCompilerTool"/>
+			<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+			<Tool Name="VFCustomBuildTool"/>
+			<Tool Name="VFPreLinkEventTool"/>
+			<Tool Name="VFPreBuildEventTool"/>
+			<Tool Name="VFPostBuildEventTool"/>
+		</Configuration>
+		<Configuration Name="Debug|x64" UseCompiler="ifxCompiler" ConfigurationType="typeStaticLibrary">
+			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
+			<Tool Name="VFLibrarianTool"/>
+			<Tool Name="VFResourceCompilerTool"/>
+			<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+			<Tool Name="VFCustomBuildTool"/>
+			<Tool Name="VFPreLinkEventTool"/>
+			<Tool Name="VFPreBuildEventTool"/>
+			<Tool Name="VFPostBuildEventTool"/>
+		</Configuration>
+		<Configuration Name="Release|Win32" UseCompiler="ifortCompiler" ConfigurationType="typeStaticLibrary">
+			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+			<Tool Name="VFLibrarianTool"/>
+			<Tool Name="VFResourceCompilerTool"/>
+			<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+			<Tool Name="VFCustomBuildTool"/>
+			<Tool Name="VFPreLinkEventTool"/>
+			<Tool Name="VFPreBuildEventTool"/>
+			<Tool Name="VFPostBuildEventTool"/>
+		</Configuration>
+		<Configuration Name="Release|x64" UseCompiler="ifxCompiler" ConfigurationType="typeStaticLibrary">
+			<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+			<Tool Name="VFLibrarianTool"/>
+			<Tool Name="VFResourceCompilerTool"/>
+			<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
+			<Tool Name="VFCustomBuildTool"/>
+			<Tool Name="VFPreLinkEventTool"/>
+			<Tool Name="VFPreBuildEventTool"/>
+			<Tool Name="VFPostBuildEventTool"/>
+		</Configuration>
+	</Configurations>
+	<Files>
+		<Filter Name="Header Files" Filter="fi;fd"/>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+			<File RelativePath=".\caxpy.f"/>
+			<File RelativePath=".\ccopy.f"/>
+			<File RelativePath=".\cdotc.f"/>
+			<File RelativePath=".\cdotu.f"/>
+			<File RelativePath=".\cgbmv.f"/>
+			<File RelativePath=".\cgemm.f"/>
+			<File RelativePath=".\cgemmtr.f"/>
+			<File RelativePath=".\cgemv.f"/>
+			<File RelativePath=".\cgerc.f"/>
+			<File RelativePath=".\cgeru.f"/>
+			<File RelativePath=".\chbmv.f"/>
+			<File RelativePath=".\chemm.f"/>
+			<File RelativePath=".\chemv.f"/>
+			<File RelativePath=".\cher.f"/>
+			<File RelativePath=".\cher2.f"/>
+			<File RelativePath=".\cher2k.f"/>
+			<File RelativePath=".\cherk.f"/>
+			<File RelativePath=".\chpmv.f"/>
+			<File RelativePath=".\chpr.f"/>
+			<File RelativePath=".\chpr2.f"/>
+			<File RelativePath=".\crotg.f90"/>
+			<File RelativePath=".\cscal.f"/>
+			<File RelativePath=".\csrot.f"/>
+			<File RelativePath=".\csscal.f"/>
+			<File RelativePath=".\cswap.f"/>
+			<File RelativePath=".\csymm.f"/>
+			<File RelativePath=".\csyr2k.f"/>
+			<File RelativePath=".\csyrk.f"/>
+			<File RelativePath=".\ctbmv.f"/>
+			<File RelativePath=".\ctbsv.f"/>
+			<File RelativePath=".\ctpmv.f"/>
+			<File RelativePath=".\ctpsv.f"/>
+			<File RelativePath=".\ctrmm.f"/>
+			<File RelativePath=".\ctrmv.f"/>
+			<File RelativePath=".\ctrsm.f"/>
+			<File RelativePath=".\ctrsv.f"/>
+			<File RelativePath=".\dasum.f"/>
+			<File RelativePath=".\daxpy.f"/>
+			<File RelativePath=".\dcabs1.f"/>
+			<File RelativePath=".\dcopy.f"/>
+			<File RelativePath=".\ddot.f"/>
+			<File RelativePath=".\dgbmv.f"/>
+			<File RelativePath=".\dgemm.f"/>
+			<File RelativePath=".\dgemmtr.f"/>
+			<File RelativePath=".\dgemv.f"/>
+			<File RelativePath=".\dger.f"/>
+			<File RelativePath=".\dnrm2.f90"/>
+			<File RelativePath=".\drot.f"/>
+			<File RelativePath=".\drotg.f90"/>
+			<File RelativePath=".\drotm.f"/>
+			<File RelativePath=".\drotmg.f"/>
+			<File RelativePath=".\dsbmv.f"/>
+			<File RelativePath=".\dscal.f"/>
+			<File RelativePath=".\dsdot.f"/>
+			<File RelativePath=".\dspmv.f"/>
+			<File RelativePath=".\dspr.f"/>
+			<File RelativePath=".\dspr2.f"/>
+			<File RelativePath=".\dswap.f"/>
+			<File RelativePath=".\dsymm.f"/>
+			<File RelativePath=".\dsymv.f"/>
+			<File RelativePath=".\dsyr.f"/>
+			<File RelativePath=".\dsyr2.f"/>
+			<File RelativePath=".\dsyr2k.f"/>
+			<File RelativePath=".\dsyrk.f"/>
+			<File RelativePath=".\dtbmv.f"/>
+			<File RelativePath=".\dtbsv.f"/>
+			<File RelativePath=".\dtpmv.f"/>
+			<File RelativePath=".\dtpsv.f"/>
+			<File RelativePath=".\dtrmm.f"/>
+			<File RelativePath=".\dtrmv.f"/>
+			<File RelativePath=".\dtrsm.f"/>
+			<File RelativePath=".\dtrsv.f"/>
+			<File RelativePath=".\dzasum.f"/>
+			<File RelativePath=".\dznrm2.f90"/>
+			<File RelativePath=".\icamax.f"/>
+			<File RelativePath=".\idamax.f"/>
+			<File RelativePath=".\isamax.f"/>
+			<File RelativePath=".\izamax.f"/>
+			<File RelativePath=".\lsame.f"/>
+			<File RelativePath=".\sasum.f"/>
+			<File RelativePath=".\saxpy.f"/>
+			<File RelativePath=".\scabs1.f"/>
+			<File RelativePath=".\scasum.f"/>
+			<File RelativePath=".\scnrm2.f90"/>
+			<File RelativePath=".\scopy.f"/>
+			<File RelativePath=".\sdot.f"/>
+			<File RelativePath=".\sdsdot.f"/>
+			<File RelativePath=".\sgbmv.f"/>
+			<File RelativePath=".\sgemm.f"/>
+			<File RelativePath=".\sgemmtr.f"/>
+			<File RelativePath=".\sgemv.f"/>
+			<File RelativePath=".\sger.f"/>
+			<File RelativePath=".\snrm2.f90"/>
+			<File RelativePath=".\srot.f"/>
+			<File RelativePath=".\srotg.f90"/>
+			<File RelativePath=".\srotm.f"/>
+			<File RelativePath=".\srotmg.f"/>
+			<File RelativePath=".\ssbmv.f"/>
+			<File RelativePath=".\sscal.f"/>
+			<File RelativePath=".\sspmv.f"/>
+			<File RelativePath=".\sspr.f"/>
+			<File RelativePath=".\sspr2.f"/>
+			<File RelativePath=".\sswap.f"/>
+			<File RelativePath=".\ssymm.f"/>
+			<File RelativePath=".\ssymv.f"/>
+			<File RelativePath=".\ssyr.f"/>
+			<File RelativePath=".\ssyr2.f"/>
+			<File RelativePath=".\ssyr2k.f"/>
+			<File RelativePath=".\ssyrk.f"/>
+			<File RelativePath=".\stbmv.f"/>
+			<File RelativePath=".\stbsv.f"/>
+			<File RelativePath=".\stpmv.f"/>
+			<File RelativePath=".\stpsv.f"/>
+			<File RelativePath=".\strmm.f"/>
+			<File RelativePath=".\strmv.f"/>
+			<File RelativePath=".\strsm.f"/>
+			<File RelativePath=".\strsv.f"/>
+			<File RelativePath=".\xerbla.f"/>
+			<File RelativePath=".\xerbla_array.f"/>
+			<File RelativePath=".\zaxpy.f"/>
+			<File RelativePath=".\zcopy.f"/>
+			<File RelativePath=".\zdotc.f"/>
+			<File RelativePath=".\zdotu.f"/>
+			<File RelativePath=".\zdrot.f"/>
+			<File RelativePath=".\zdscal.f"/>
+			<File RelativePath=".\zgbmv.f"/>
+			<File RelativePath=".\zgemm.f"/>
+			<File RelativePath=".\zgemmtr.f"/>
+			<File RelativePath=".\zgemv.f"/>
+			<File RelativePath=".\zgerc.f"/>
+			<File RelativePath=".\zgeru.f"/>
+			<File RelativePath=".\zhbmv.f"/>
+			<File RelativePath=".\zhemm.f"/>
+			<File RelativePath=".\zhemv.f"/>
+			<File RelativePath=".\zher.f"/>
+			<File RelativePath=".\zher2.f"/>
+			<File RelativePath=".\zher2k.f"/>
+			<File RelativePath=".\zherk.f"/>
+			<File RelativePath=".\zhpmv.f"/>
+			<File RelativePath=".\zhpr.f"/>
+			<File RelativePath=".\zhpr2.f"/>
+			<File RelativePath=".\zrotg.f90"/>
+			<File RelativePath=".\zscal.f"/>
+			<File RelativePath=".\zswap.f"/>
+			<File RelativePath=".\zsymm.f"/>
+			<File RelativePath=".\zsyr2k.f"/>
+			<File RelativePath=".\zsyrk.f"/>
+			<File RelativePath=".\ztbmv.f"/>
+			<File RelativePath=".\ztbsv.f"/>
+			<File RelativePath=".\ztpmv.f"/>
+			<File RelativePath=".\ztpsv.f"/>
+			<File RelativePath=".\ztrmm.f"/>
+			<File RelativePath=".\ztrmv.f"/>
+			<File RelativePath=".\ztrsm.f"/>
+			<File RelativePath=".\ztrsv.f"/>
+		</Filter>
+	</Files>
+	<Globals/>
+</VisualStudioProject>

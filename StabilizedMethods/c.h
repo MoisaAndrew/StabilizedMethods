@@ -49,7 +49,7 @@ extern "C"
     /// <para> iwork[9] - Maximum number of stages used </para>
     /// </returns>
     int rkc_solver(const unsigned n, const double x, const double xend, double* y,
-        const FcnEqDiff f, const Rho rho, const SolTrait solout,
+        const Fcn f, const Rho rho, const SolTrait solout,
         const double* atol, const double rtol,
         unsigned iwork[10], const int method);
 
@@ -58,14 +58,14 @@ extern "C"
     /// <para> Parameters are the same as for the rkc_solver </para>
     /// </summary>
     int mono(const unsigned n, const double x, const double xend, double* y,
-        const FcnEqDiff f, const Rho rho, const SolTrait solout,
+        const Fcn f, const Rho rho, const SolTrait solout,
         const double* atol, const double rtol,
         unsigned iwork[10]);
 
 
     int dumka3(const unsigned neqn, double* time, const double tend, const double h0,
         const double atol, const double rtol,
-        const FcnEqDiff f, const Rho cour,
+        const Fcn f, const Rho cour,
         double* y, double* z0, double* z1, double* z2,
         double* z3, double* oldEigenVector,
         unsigned iwork[12]);

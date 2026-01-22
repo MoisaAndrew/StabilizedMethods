@@ -15,7 +15,7 @@ struct Bruss2dParams : ProblemParams
 		xend = 11.5;
 
 		isRhoDefined = false;
-		isJacConst = false;
+		isSpradConst = false;
 	}
 
 	double* y0(const unsigned n) const

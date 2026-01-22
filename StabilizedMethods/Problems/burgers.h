@@ -15,7 +15,7 @@ struct BurgersParams : ProblemParams
 		xend = 2.5;
 
 		isRhoDefined = false;
-		isJacConst = false;
+		isSpradConst = false;
 	}
 
 	double* y0(const unsigned n) const

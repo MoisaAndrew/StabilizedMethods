@@ -28,7 +28,7 @@ static void fcusp(const unsigned* n, const double* x, const double* y, double* f
 }
 
 
-void get_cusp(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
+void get_cusp(ProblemParams** params, Fcn* fcn, Rho* rho, Jac* jac, PSol* psol)
 {
     *params = new CuspParams();
 

@@ -140,7 +140,7 @@ bool  isStepAccepted(const unsigned int neqn, const double* z, double* h_new,
 *              used in ROCK and RKC
 */
 double eigenvalue(const unsigned int neqn, const double* y, double* fy, double t,
-	const FcnEqDiff f,
+	const Fcn f,
 	double* v, double* result,
 	double* lambdaOld, unsigned* numOfRHSEvaluations, double minimumValue)
 {
@@ -195,7 +195,7 @@ double eigenvalue(const unsigned int neqn, const double* y, double* fy, double t
 
 int dumka3(const unsigned neqn, double* time, const double tend, const double h0,
 	const double atol, const double rtol,
-	const FcnEqDiff f, const Rho cour,
+	const Fcn f, const Rho cour,
 	double* y, double* z0, double* z1, double* z2,
 	double* z3, double* oldEigenVector,
 	unsigned iwork[12]) {

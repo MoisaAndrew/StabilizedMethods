@@ -21,7 +21,7 @@ static void fheat(const unsigned* n, const double* x, const double* y, double* f
 /// This problem can be used to test a method's convergence.
 /// Just remove an adaptive step size selection from the method's code.
 /// </summary>
-void get_heat(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
+void get_heat(ProblemParams** params, Fcn* fcn, Rho* rho, Jac* jac, PSol* psol)
 {
     *params = new HeatParams();
 

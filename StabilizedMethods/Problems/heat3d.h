@@ -12,7 +12,7 @@ struct Heat3dParams : ProblemParams
 		xend = 0.7;
 
 		isRhoDefined = true;
-		isJacConst = true;
+		isSpradConst = true;
 	}
 
 	double* y0(const unsigned n) const

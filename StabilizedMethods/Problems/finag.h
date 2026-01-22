@@ -17,7 +17,7 @@ struct FinagParams : ProblemParams
 		xend = 400;
 
 		isRhoDefined = false;
-		isJacConst = false;
+		isSpradConst = false;
 	}
 
 	double* y0(const unsigned n) const

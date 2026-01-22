@@ -23,7 +23,7 @@ static void fbruss(const unsigned* n, const double* x, const double* y, double* 
 }
 
 
-void get_bruss(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
+void get_bruss(ProblemParams** params, Fcn* fcn, Rho* rho, Jac* jac, PSol* psol)
 {
     *params = new BrussParams();
 

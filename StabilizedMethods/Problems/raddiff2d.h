@@ -15,7 +15,7 @@ struct RadDiff2dParams : ProblemParams
 		xend = 3;
 
 		isRhoDefined = true;
-		isJacConst = true;
+		isSpradConst = true;
 	}
 
 	double* y0(const unsigned n) const

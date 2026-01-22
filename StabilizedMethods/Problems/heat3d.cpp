@@ -101,10 +101,27 @@ static void rhoheat3d(const unsigned* n, const double* x, const double* y, doubl
 }
 
 
-void get_heat3d(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
+static void jacheat3d(Fcn fcn,
+	const unsigned* n, const double* x, const double* y,
+	const double* yy, const double* rewt, const double* f, const double* ff,
+	const double* hrl1, double* p, int* iwp, int* idid)
 {
-    *params = new Heat3dParams();
+	const unsigned ns = (unsigned)(0.5 + pow(*n, 0.3333333333333333));
+	const double h = 1. / (ns + 1);
 
-    *fcn = fheat3d;
+	for (unsigned i = 0; i < *n; i++)
+	{
+		p[i] = 1 + *hrl1 * 6 / (h * h);
+	}
+}
+
+
+void get_heat3d(ProblemParams** params, Fcn* fcn, Rho* rho, Jac* jac, PSol* psol)
+{
+	*params = new Heat3dParams();
+
+	*fcn = fheat3d;
 	*rho = rhoheat3d;
+	*jac = jacheat3d;
+	*psol = psoldiag;
 }

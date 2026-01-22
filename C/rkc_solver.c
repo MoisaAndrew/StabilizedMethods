@@ -4,7 +4,7 @@
 #include "methods_common.h"
 
 
-static double rkc_rho(const unsigned n, const double x, const FcnEqDiff f,
+static double rkc_rho(const unsigned n, const double x, const Fcn f,
 	double* yn, double* fn, double* v, double* fv, double* eigvec,
 	const double hmax, const double uround, unsigned iwork[10])
 {
@@ -110,7 +110,7 @@ static double rkc_rho(const unsigned n, const double x, const FcnEqDiff f,
 }
 
 
-static void step_rkc(const unsigned n, const double x, const FcnEqDiff f,
+static void step_rkc(const unsigned n, const double x, const Fcn f,
 	const double* yn, const double* fn, const double h, const unsigned m,
 	double* y, double* yjm1, double* yjm2)
 {
@@ -186,7 +186,7 @@ static void step_tsrkc2(const unsigned n,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m,
 	const double w, const double beta, const double gamma, const double acoshtds,
-	const FcnEqDiff f,
+	const Fcn f,
 	double* y2, double* yjm1, double* yjm2)
 {
 	double* yswap;
@@ -240,7 +240,7 @@ static void step_tsrkc3(const unsigned n,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m, const double w0, const double acoshtds,
 	const double w1, const double alpha, const double gamma,
-	const FcnEqDiff f, double* y2, double* yjm1, double* yjm2)
+	const Fcn f, double* y2, double* yjm1, double* yjm2)
 {
 	unsigned i;
 	double* swap, * res = y2;
@@ -315,7 +315,7 @@ static void step_tsrkc3(const unsigned n,
 
 
 static int rkc_core(const unsigned n, double x, const double xend, double* y,
-	const FcnEqDiff f, const Rho rho, const SolTrait solout,
+	const Fcn f, const Rho rho, const SolTrait solout,
 	const double* atol, const double rtol, const double uround,
 	double* work, unsigned iwork[10], const int method)
 {
@@ -778,7 +778,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 
 
 int rkc_solver(const unsigned n, const double x, const double xend, double* y,
-	const FcnEqDiff f, const Rho rho, const SolTrait solout,
+	const Fcn f, const Rho rho, const SolTrait solout,
 	const double* atol, const double rtol,
 	unsigned iwork[10], const int method)
 {

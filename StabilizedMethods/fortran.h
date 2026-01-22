@@ -35,12 +35,16 @@ extern "C" {
 
 #define RKCF FORTRAN_NAME(RKC)
 #define rkcdid_ FORTRAN_NAME(RKCDID)
+
+#define VODPK FORTRAN_NAME(DVODPK)
 #else
 #define ROCK2F FORTRAN_NAME(rock2)
 #define ROCK4F FORTRAN_NAME(rock4) 
 
 #define RKCF FORTRAN_NAME(rkc) 
 #define rkcdid_ FORTRAN_NAME(rkcdid)
+
+#define VODPK FORTRAN_NAME(dvodpk)
 #endif
 
 
@@ -69,6 +73,32 @@ extern "C" {
     extern struct {
         int nfe, nsteps, naccpt, nrejct, nfesig, maxm;
     } rkcdid_;
+
+    void VODPK
+    (
+        void F(const unsigned* NEQ, const double* T, const double* Y, double* YDOT/*, const double* RPAR, const int* IPAR*/),
+        const unsigned* NEQ, double* Y, double* T, const double* TOUT,
+        const unsigned* ITOL, const double* RTOL, const double* ATOL,
+        const unsigned* ITASK, int* ISTATE, const unsigned* IOPT,
+        double* RWORK, const unsigned* LRW, unsigned* IWORK, const unsigned* LIW,
+        void JAC
+        (
+            void F(const unsigned* NEQ, const double* T, const double* Y, double* YDOT/*, const double* RPAR, const int* IPAR*/),
+            const unsigned* NEQ, const double* T, const double* Y, const double* YSV,
+            const double* REWT, const double* FTY, const double* V,
+            const double* HRL1, double* WP, int* IWP, int* IER/*,
+            const double* RPAR, const int* IPAR*/
+        ),
+        void PSOL
+        (
+            const unsigned* NEQ, const double* T, const double* Y,
+            const double* FTY, double* WK,
+            const double* HRL1, double* WP, int* IWP,
+            double* B, const unsigned* LR, int* IER/*,
+            const double* RPAR, const int* IPAR*/
+        ),
+        const unsigned* MF/*, const double* RPAR, const int* IPAR*/
+    );
 
 
 #ifdef __cplusplus

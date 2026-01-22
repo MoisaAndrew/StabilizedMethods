@@ -18,7 +18,7 @@ struct Comb2dParams : ProblemParams
 		xend = 0.32;
 
 		isRhoDefined = false;
-		isJacConst = false;
+		isSpradConst = false;
 	}
 
 	double* y0(const unsigned n) const

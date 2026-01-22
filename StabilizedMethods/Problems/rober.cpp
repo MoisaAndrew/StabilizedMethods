@@ -9,7 +9,7 @@ static void frober(const unsigned* n, const double* x, const double* y, double* 
 }
 
 
-void get_rober(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
+void get_rober(ProblemParams** params, Fcn* fcn, Rho* rho, Jac* jac, PSol* psol)
 {
     *params = new RoberParams();
 

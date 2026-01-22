@@ -14,7 +14,7 @@ static void fhires(const unsigned* n, const double* x, const double* y, double* 
 }
 
 
-void get_hires(ProblemParams** params, FcnEqDiff* fcn, Rho* rho)
+void get_hires(ProblemParams** params, Fcn* fcn, Rho* rho, Jac* jac, PSol* psol)
 {
     *params = new HiresParams();
 
