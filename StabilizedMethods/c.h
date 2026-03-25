@@ -35,6 +35,7 @@ extern "C"
     ///	<para> = 0 Atol is scalar </para>
     ///	<para> = 1 Atol is array of length n </para>
     /// </param>
+    /// <param name="work">Workspace of length (4 + (iwork[0] == 0 ? 1 : 0) + (method != 2 ? 1 : 0)) * n.</param>
     /// <returns>
     /// <para> 1 Successful computation x = xend; </para>
     /// <para> 3 Improper error control; </para>
@@ -51,7 +52,7 @@ extern "C"
     int rkc_solver(const unsigned n, const double x, const double xend, double* y,
         const Fcn f, const Rho rho, const SolTrait solout,
         const double* atol, const double rtol,
-        unsigned iwork[10], const int method);
+        unsigned iwork[10], double* work, const int method);
 
     /// <summary>
     /// Monotonic stabilized method by B. Faleichik

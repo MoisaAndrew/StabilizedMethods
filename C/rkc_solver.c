@@ -1,4 +1,4 @@
-//	Version of April 2025
+//	Version of March 2026
 
 
 #include "methods_common.h"
@@ -354,9 +354,6 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 
 	double* swap, * res = y;
 
-	const double tsw = method == 0 ? 1.25 : 1.1;
-	const double acosht = acosh(tsw);
-
 	memcpy(yn, y, n * sizeof(double));
 	f(&n, &x, yn, fn);
 	iwork[4]++;
@@ -415,130 +412,133 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		absh = hmax;
 	}
 
-	last = false;
-	if (1.1 * absh >= fabs(xend - x))
+	while (true) // The first step by RKC
 	{
-		absh = fabs(xend - x);
-		last = true;
-	}
-
-	m = 1 + (unsigned)sqrt(1.54 * absh * sprad + 1.);
-	if (m > mmax)
-	{
-		m = mmax;
-		absh = (m * m - 1.) / (1.54 * sprad);
 		last = false;
-	}
-	iwork[9] = m > iwork[9] ? m : iwork[9];
-
-	h = tdir * absh;
-	hmin = 10. * uround * fmax(fabs(x), fabs(x + h));
-	step_rkc(n, x, f, yn, fn, h, m, y, vtemp1, vtemp2);
-	ci = x + h;
-	f(&n, &ci, y, vtemp1);
-	iwork[4] += m;
-	iwork[5]++;
-
-	err = 0.;
-	at = atol[0];
-	for (i = 0; i < n; i++)
-	{
-		if (iwork[3])
+		if (1.1 * absh >= fabs(xend - x))
 		{
-			at = atol[i];
-		}
-		wt = at + rtol * fmax(fabs(y[i]), fabs(yn[i]));
-		if (wt == 0)
-		{
-			return 3;
+			absh = fabs(xend - x);
+			last = true;
 		}
 
-		if (method == 0)
+		m = 1 + (unsigned)sqrt(1.54 * absh * sprad + 1.);
+		if (m > mmax)
 		{
-			est = 1.2 * (yn[i] - y[i]) + 0.6 * h * (fn[i] + vtemp1[i]);
+			m = mmax;
+			absh = (m * m - 1.) / (1.54 * sprad);
+			last = false;
 		}
-		else if (method == 1)
-		{
-			est = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
-		}
-		else
-		{
-			est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
-		}
+		iwork[9] = m > iwork[9] ? m : iwork[9];
 
-		err = err + pow(est / wt, 2);
-	}
-	err = sqrt(err / n);
+		h = tdir * absh;
+		hmin = 10. * uround * fmax(fabs(x), fabs(x + h));
+		step_rkc(n, x, f, yn, fn, h, m, y, vtemp1, vtemp2);
+		ci = x + h;
+		f(&n, &ci, y, vtemp1);
+		iwork[4] += m;
+		iwork[5]++;
 
-	if (!isfinited(err))
-	{
-		return 4;
-	}
-	if (err > 1.)
-	{
-		iwork[7]++;
-		absh *= 0.8 * pow(err, -0.3333333333333333);
-		if (absh < hmin)
+		err = 0.;
+		at = atol[0];
+		for (i = 0; i < n; i++)
+		{
+			if (iwork[3])
+			{
+				at = atol[i];
+			}
+			wt = at + rtol * fmax(fabs(y[i]), fabs(yn[i]));
+			if (wt == 0)
+			{
+				return 3;
+			}
+
+			if (method == 0)
+			{
+				est = 1.2 * (yn[i] - y[i]) + 0.6 * h * (fn[i] + vtemp1[i]);
+			}
+			else if (method == 1)
+			{
+				est = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
+			}
+			else
+			{
+				est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
+			}
+
+			err = err + pow(est / wt, 2);
+		}
+		err = sqrt(err / n);
+
+		if (!isfinited(err))
 		{
 			return 4;
 		}
-		else
+		if (err > 1.)
 		{
-			newspc = !jacatt;
-		}
-	}
-
-	if (newspc)
-	{
-		if (iwork[2] == 1)
-		{
-			solout(n, x, x + h, y);
-		}
-
-		iwork[6]++;
-		x += h;
-
-		if (last)
-		{
-			if (res != y)
+			iwork[7]++;
+			absh *= 0.8 * pow(err, -0.3333333333333333);
+			if (absh < hmin)
 			{
-				memcpy(res, y, n * sizeof(double));
+				return 4;
 			}
-			return 1;
-		}
-
-		jacatt = iwork[1] == 1;
-		nstsig = (nstsig + 1) % 25;
-		if (iwork[0] == 1 || nstsig == 0)
-		{
-			newspc = !jacatt;
 		}
 		else
 		{
-			newspc = false;
+			break;
 		}
-
-		swap = vtemp2;
-		vtemp2 = fn;
-		fn = vtemp1;
-		if (method == 2) // RKC
-		{
-			vtemp1 = yn;
-		}
-		else // TSRKC3 or TSRKC2
-		{
-			vtemp1 = yold;
-			yold = yn;
-		}
-		yn = y;
-		y = swap;
-
-		abshold = absh;
-		fac = pow(err, -errpow);
-		absh *= fmax(0.1, fmin(0.8 * fac, facmax));
-		absh = fmax(hmin, fmin(hmax, absh));
-		errold = err;
 	}
+
+	if (iwork[2] == 1)
+	{
+		solout(n, x, x + h, y);
+	}
+
+	iwork[6]++;
+	x += h;
+
+	if (last)
+	{
+		if (res != y)
+		{
+			memcpy(res, y, n * sizeof(double));
+		}
+		return 1;
+	}
+
+	jacatt = iwork[1] == 1;
+	nstsig = (nstsig + 1) % 25;
+	if (iwork[0] == 1 || nstsig == 0)
+	{
+		newspc = !jacatt;
+	}
+	else
+	{
+		newspc = false;
+	}
+
+	swap = vtemp2;
+	vtemp2 = fn;
+	fn = vtemp1;
+	if (method == 2) // RKC
+	{
+		vtemp1 = yn;
+	}
+	else // TSRKC3 or TSRKC2
+	{
+		vtemp1 = yold;
+		yold = yn;
+	}
+	yn = y;
+	y = swap;
+
+	abshold = absh;
+	fac = pow(err, -errpow);
+	absh *= fmax(0.1, fmin(0.8 * fac, facmax));
+	absh = fmax(hmin, fmin(hmax, absh));
+	errold = err;
+
+	const double tsw = method == 0 ? 1.25 : 1.1;
+	const double acosht = acosh(tsw);
 
 	while (true)
 	{
@@ -569,7 +569,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		q = abshold / absh;
 		onemq = 1 - q;
 
-		if (method == 2 || iwork[6] == 0) // RKC
+		if (method == 2) // RKC
 		{
 			m = 1 + (unsigned)sqrt(1.54 * absh * sprad + 1.);
 			if (m > mmax)
@@ -678,14 +678,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 
 			if (method == 0)
 			{
-				if (iwork[6] == 0)
-				{
-					est = 1.2 * (yn[i] - y[i]) + 0.6 * h * (fn[i] + vtemp1[i]);
-				}
-				else
-				{
-					est = 0.6 * (yn[i] / q - yold[i] / (q * onepq2) - y[i] * (2 + q) / onepq2 + h * vtemp1[i] / onepq);
-				}
+				est = 0.6 * (yn[i] / q - yold[i] / (q * onepq2) - y[i] * (2 + q) / onepq2 + h * vtemp1[i] / onepq);
 			}
 			else if (method == 1)
 			{
@@ -780,7 +773,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 int rkc_solver(const unsigned n, const double x, const double xend, double* y,
 	const Fcn f, const Rho rho, const SolTrait solout,
 	const double* atol, const double rtol,
-	unsigned iwork[10], const int method)
+	unsigned iwork[10], double* work, const int method)
 {
 	const double uround = 1e-16;
 
@@ -808,20 +801,7 @@ int rkc_solver(const unsigned n, const double x, const double xend, double* y,
 	iwork[4] = 0, iwork[5] = 0, iwork[6] = 0,
 	iwork[7] = 0, iwork[8] = 0, iwork[9] = 0;
 
-	unsigned long long work_length = 4;
-	if (iwork[0] == 0)
-	{
-		work_length++;
-	}
-	if (method != 2)
-	{
-		work_length++;
-	}
-	double* work = (double*)malloc(work_length * n * sizeof(double));
-
 	int idid = rkc_core(n, x, xend, y, f, rho, solout, atol, rtol, uround, work, iwork, method);
-
-	free(work);
 
 	return idid;
 }
