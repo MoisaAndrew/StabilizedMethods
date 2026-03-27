@@ -77,7 +77,7 @@ static double mono_rho(const unsigned n, const double x, const Fcn f,
 		dfnrm = 0.;
 		for (i = 0; i < n; i++)
 		{
-			dfnrm += pow(fv[i] - fn[i], 2);
+			dfnrm += (fv[i] - fn[i]) * (fv[i] - fn[i]);
 		}
 		dfnrm = sqrt(dfnrm);
 		sigmal = sigma;
@@ -1211,7 +1211,7 @@ static int mono_core(const unsigned n, double x, const double xend, double* y,
 				{
 					return 3;
 				}
-				est += pow((vtemp2[i] - fn[i]) / wt, 2);
+				est += (vtemp2[i] - fn[i]) * (vtemp2[i] - fn[i]) / (wt * wt);
 			}
 			est = absh * sqrt(est / n);
 			if (0.1 * absh < hmax * sqrt(est))
@@ -1289,7 +1289,7 @@ static int mono_core(const unsigned n, double x, const double xend, double* y,
 			}
 
 			est = 0.1 * (yn[i] - y[i] + h * vtemp1[i]);
-			err = err + pow(est / wt, 2);
+			err += (est * est) / (wt * wt);
 		}
 		err = sqrt(err / n);
 

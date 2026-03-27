@@ -77,7 +77,7 @@ static double rkc_rho(const unsigned n, const double x, const Fcn f,
 		dfnrm = 0.;
 		for (i = 0; i < n; i++)
 		{
-			dfnrm += pow(fv[i] - fn[i], 2);
+			dfnrm += (fv[i] - fn[i]) * (fv[i] - fn[i]);
 		}
 		dfnrm = sqrt(dfnrm);
 		sigmal = sigma;
@@ -327,7 +327,8 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 	const double facmax = method == 0 ? 2 : 10;
 	const double errpow = method == 1 ? 0.5 : 0.3333333333333333;
 	double hmin = 10. * uround * fmax(fabs(x), hmax);
-	double absh, h, abshold, est, sprad, wt, at, err, errold, fac, temp, ci;
+	double absh, h, abshold, sprad, wt, at, err, errold, fac, temp, ci;
+	double est0, est1, est2;
 	double q, onemq, onepq, onepq2, s, s2, w, w2, w2m1, dtsw, d2tsw, d3tsw;
 	double alpha, beta, gamma, acoshtds;
 	unsigned i, m, mold = 0;
@@ -387,7 +388,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 	f(&n, &ci, vtemp1, vtemp2);
 	iwork[4]++;
 
-	est = 0.;
+	err = 0.;
 	at = atol[0];
 	for (i = 0; i < n; i++)
 	{
@@ -400,12 +401,12 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		{
 			return 3;
 		}
-		est += pow((vtemp2[i] - fn[i]) / wt, 2);
+		err += (vtemp2[i] - fn[i]) * (vtemp2[i] - fn[i]) / (wt * wt);
 	}
-	est = absh * sqrt(est / n);
-	if (0.1 * absh < hmax * sqrt(est))
+	err = absh * sqrt(err / n);
+	if (0.1 * absh < hmax * sqrt(err))
 	{
-		absh = fmax(0.1 * absh / sqrt(est), hmin);
+		absh = fmax(0.1 * absh / sqrt(err), hmin);
 	}
 	else
 	{
@@ -454,18 +455,19 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 
 			if (method == 0)
 			{
-				est = 1.2 * (yn[i] - y[i]) + 0.6 * h * (fn[i] + vtemp1[i]);
+				est0 = 1.2 * (yn[i] - y[i]) + 0.6 * h * (fn[i] + vtemp1[i]);
+				err += (est0 * est0) / (wt * wt);
 			}
 			else if (method == 1)
 			{
-				est = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
+				est1 = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
+				err += (est1 * est1) / (wt * wt);
 			}
 			else
 			{
-				est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
+				est2 = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
+				err += (est2 * est2) / (wt * wt);
 			}
-
-			err = err + pow(est / wt, 2);
 		}
 		err = sqrt(err / n);
 
@@ -476,7 +478,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		if (err > 1.)
 		{
 			iwork[7]++;
-			absh *= 0.8 * pow(err, -0.3333333333333333);
+			absh *= 0.8 / cbrt(err);
 			if (absh < hmin)
 			{
 				return 4;
@@ -615,7 +617,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				d3tsw = ((1 + 2 * w2 + s2 * w2m1) * dtsw - 3 * s2 * w * tsw) / (w2m1 * w2m1);
 			}
 
-			beta = (onemq * d2tsw + sqrt(pow(onemq * d2tsw, 2) + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
+			beta = (onemq * d2tsw + sqrt(onemq * onemq * d2tsw * d2tsw + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
 			alpha = onepq / (q * dtsw + beta * d2tsw);
 			gamma = (alpha * dtsw - 1) / q;
 
@@ -646,7 +648,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				d2tsw = (s * s * tsw - w * dtsw) / w2m1;
 			}
 
-			beta = (onemq * dtsw + sqrt(pow(onemq * dtsw, 2) + 4 * q * tsw * d2tsw)) / (2 * d2tsw);
+			beta = (onemq * dtsw + sqrt(onemq * onemq * dtsw * dtsw + 4 * q * tsw * d2tsw)) / (2 * d2tsw);
 			gamma = (1 + q) * tsw / (q * tsw + beta * dtsw);
 
 			h = tdir * absh;
@@ -678,18 +680,19 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 
 			if (method == 0)
 			{
-				est = 0.6 * (yn[i] / q - yold[i] / (q * onepq2) - y[i] * (2 + q) / onepq2 + h * vtemp1[i] / onepq);
+				est0 = 0.6 * (yn[i] / q - yold[i] / (q * onepq2) - y[i] * (2 + q) / onepq2 + h * vtemp1[i] / onepq);
+				err += (est0 * est0) / (wt * wt);
 			}
 			else if (method == 1)
 			{
-				est = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
+				est1 = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
+				err += (est1 * est1) / (wt * wt);
 			}
 			else if (method == 2)
 			{
-				est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
+				est2 = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
+				err += (est2 * est2) / (wt * wt);
 			}
-
-			err = err + pow(est / wt, 2);
 		}
 		err = sqrt(err / n);
 
