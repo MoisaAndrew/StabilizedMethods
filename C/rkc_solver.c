@@ -1,4 +1,4 @@
-//	Version of March 2026
+//	Version of April 2026
 
 
 #include "methods_common.h"
@@ -110,17 +110,17 @@ static double rkc_rho(const unsigned n, const double x, const Fcn f,
 }
 
 
-static void step_rkc(const unsigned n, const double x, const Fcn f,
-	const double* yn, const double* fn, const double h, const unsigned m,
+static void step_rkc(const unsigned n, 
+	const double x, const double h, 
+	const double* yn, const double* fn, 
+	const unsigned m,
+	const double w0, const double w1,
+	const Fcn f,
 	double* y, double* yjm1, double* yjm2)
 {
 	unsigned i;
 	double* swap, * res = y;
 
-	double w0 = 1. + 2. / (13. * m * m);
-	double temp1 = w0 * w0 - 1., temp2 = sqrt(temp1);
-	double arg = m * log(w0 + temp2);
-	double w1 = sinh(arg) * temp1 / (cosh(arg) * m * temp2 - w0 * sinh(arg));
 	double bjm1 = 1. / (4. * w0 * w0), bjm2 = bjm1;
 
 	memcpy(yjm2, yn, n * sizeof(double));
@@ -185,15 +185,15 @@ static void step_tsrkc2(const unsigned n,
 	const double x1, const double h,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m,
-	const double w, const double beta, const double gamma, const double acoshtds,
+	const double w0, const double w1, const double g, const double acoshtds,
 	const Fcn f,
 	double* y2, double* yjm1, double* yjm2)
 {
 	double* yswap;
 	double* res = y2;
-	const double hbeta = h * beta;
-	double coshims = 1, coshi = w, tim1wdtiw;
-	double temp1 = hbeta / w, temp2, temp3;
+	const double hw1 = h * w1;
+	double coshims = 1, coshi = w0, tim1wdtiw;
+	double temp1 = hw1 / w0, temp2, temp3;
 	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
 	unsigned i, j;
 
@@ -208,8 +208,8 @@ static void step_tsrkc2(const unsigned n,
 		coshims = coshi;
 		coshi = cosh(i * acoshtds);
 		tim1wdtiw = coshims / coshi;
-		temp1 = 2 * hbeta * tim1wdtiw;
-		temp2 = 2 * w * tim1wdtiw;
+		temp1 = 2 * hw1 * tim1wdtiw;
+		temp2 = 2 * w0 * tim1wdtiw;
 		temp3 = 1 - temp2;
 		f(&n, &ci1, yjm1, y2);
 		ci1 = temp1 + temp2 * ci2 + temp3 * ci3;
@@ -227,10 +227,10 @@ static void step_tsrkc2(const unsigned n,
 		ci2 = ci1;
 	}
 
-	temp3 = 1 - gamma;
+	temp3 = 1 - g;
 	for (j = 0; j < n; j++)
 	{
-		res[j] = temp3 * y0[j] + gamma * yjm1[j];
+		res[j] = temp3 * y0[j] + g * yjm1[j];
 	}
 }
 
@@ -239,7 +239,7 @@ static void step_tsrkc3(const unsigned n,
 	const double x1, const double h,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m, const double w0, const double acoshtds,
-	const double w1, const double alpha, const double gamma,
+	const double w1, const double a, const double g,
 	const Fcn f, double* y2, double* yjm1, double* yjm2)
 {
 	unsigned i;
@@ -305,11 +305,11 @@ static void step_tsrkc3(const unsigned n,
 		}
 	}
 
-	bj = alpha / (bj * w1);
-	mu = 1 - gamma - bj;
+	bj = a / (bj * w1);
+	mu = 1 - g - bj;
 	for (i = 0; i < n; i++)
 	{
-		res[i] = mu * y1[i] + gamma * y0[i] + bj * y2[i];
+		res[i] = mu * y1[i] + g * y0[i] + bj * y2[i];
 	}
 }
 
@@ -327,10 +327,9 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 	const double facmax = method == 0 ? 2 : 10;
 	const double errpow = method == 1 ? 0.5 : 0.3333333333333333;
 	double hmin = 10. * uround * fmax(fabs(x), hmax);
-	double absh, h, abshold, sprad, wt, at, err, errold, fac, temp, ci;
-	double est0, est1, est2;
-	double q, onemq, onepq, onepq2, s, s2, w, w2, w2m1, dtsw, d2tsw, d3tsw;
-	double alpha, beta, gamma, acoshtds;
+	double absh, h, abshold, est, sprad, wt, at, err, errold, fac, temp, ci;
+	double q, onemq, onepq, onepq2, s, s2, w0, w0sq, w0sqm1, dtsw, d2tsw, d3tsw;
+	double a, w1, g, acoshtds;
 	unsigned i, m, mold = 0;
 
 	double* yn = &work[0];
@@ -429,11 +428,19 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			absh = (m * m - 1.) / (1.54 * sprad);
 			last = false;
 		}
+		s = (double)m;
+		s2 = s * s;
+		w0 = 1. + 2. / (13. * s2);
+		w0sq = w0 * w0;
+		w0sqm1 = w0sq - 1;
+		dtsw = s * sinh(s * acosh(w0)) / sqrt(w0sqm1);
+		d2tsw = (s2 * cosh(s * acosh(w0)) - w0 * dtsw) / w0sqm1;
+		w1 = dtsw / d2tsw;
 		iwork[9] = m > iwork[9] ? m : iwork[9];
 
 		h = tdir * absh;
 		hmin = 10. * uround * fmax(fabs(x), fabs(x + h));
-		step_rkc(n, x, f, yn, fn, h, m, y, vtemp1, vtemp2);
+		step_rkc(n, x, h, yn, fn, m, w0, w1, f, y, vtemp1, vtemp2);
 		ci = x + h;
 		f(&n, &ci, y, vtemp1);
 		iwork[4] += m;
@@ -448,26 +455,21 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				at = atol[i];
 			}
 			wt = at + rtol * fmax(fabs(y[i]), fabs(yn[i]));
-			if (wt == 0)
-			{
-				return 3;
-			}
 
 			if (method == 0)
 			{
-				est0 = 1.2 * (yn[i] - y[i]) + 0.6 * h * (fn[i] + vtemp1[i]);
-				err += (est0 * est0) / (wt * wt);
+				est = 1.2 * (yn[i] - y[i]) + 0.6 * h * (fn[i] + vtemp1[i]);
 			}
 			else if (method == 1)
 			{
-				est1 = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
-				err += (est1 * est1) / (wt * wt);
+				est = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
 			}
 			else
 			{
-				est2 = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
-				err += (est2 * est2) / (wt * wt);
+				est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
 			}
+
+			err += (est * est) / (wt * wt);
 		}
 		err = sqrt(err / n);
 
@@ -582,8 +584,20 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				last = false;
 			}
 
+			if (m != mold)
+			{
+				s = (double)m;
+				s2 = s * s;
+				w0 = 1. + 2. / (13. * s2);
+				w0sq = w0 * w0;
+				w0sqm1 = w0sq - 1;
+				dtsw = s * sinh(s * acosh(w0)) / sqrt(w0sqm1);
+				d2tsw = (s2 * cosh(s * acosh(w0)) - w0 * dtsw) / w0sqm1;
+				w1 = dtsw / d2tsw;
+			}
+
 			h = tdir * absh;
-			step_rkc(n, x, f, yn, fn, h, m, y, vtemp1, vtemp2);
+			step_rkc(n, x, h, yn, fn, m, w0, w1, f, y, vtemp1, vtemp2);
 		}
 		else if (method == 0) // TSRKC3
 		{
@@ -609,20 +623,20 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				s = (double)m;
 				s2 = s * s;
 				acoshtds = acosht / s;
-				w = cosh(acoshtds);
-				w2 = w * w;
-				w2m1 = w2 - 1;
-				dtsw = s * sinh(acosht) / sqrt(w2m1);
-				d2tsw = (s2 * tsw - w * dtsw) / w2m1;
-				d3tsw = ((1 + 2 * w2 + s2 * w2m1) * dtsw - 3 * s2 * w * tsw) / (w2m1 * w2m1);
+				w0 = cosh(acoshtds);
+				w0sq = w0 * w0;
+				w0sqm1 = w0sq - 1;
+				dtsw = s * sinh(acosht) / sqrt(w0sqm1);
+				d2tsw = (s2 * tsw - w0 * dtsw) / w0sqm1;
+				d3tsw = ((1 + 2 * w0sq + s2 * w0sqm1) * dtsw - 3 * s2 * w0 * tsw) / (w0sqm1 * w0sqm1);
 			}
 
-			beta = (onemq * d2tsw + sqrt(onemq * onemq * d2tsw * d2tsw + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
-			alpha = onepq / (q * dtsw + beta * d2tsw);
-			gamma = (alpha * dtsw - 1) / q;
+			w1 = (onemq * d2tsw + sqrt(onemq * onemq * d2tsw * d2tsw + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
+			a = onepq / (q * dtsw + w1 * d2tsw);
+			g = (a * dtsw - 1) / q;
 
 			h = tdir * absh;
-			step_tsrkc3(n, x, h, yold, yn, fn, m, w, acoshtds, beta, alpha, gamma, f, y, vtemp1, vtemp2);
+			step_tsrkc3(n, x, h, yold, yn, fn, m, w0, acoshtds, w1, a, g, f, y, vtemp1, vtemp2);
 		}
 		else if (method == 1) // TSRKC2
 		{
@@ -642,17 +656,17 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			{
 				s = (double)m;
 				acoshtds = acosht / s;
-				w = cosh(acoshtds);
-				w2m1 = w * w - 1;
-				dtsw = s * sinh(acosht) / sqrt(w2m1);
-				d2tsw = (s * s * tsw - w * dtsw) / w2m1;
+				w0 = cosh(acoshtds);
+				w0sqm1 = w0 * w0 - 1;
+				dtsw = s * sinh(acosht) / sqrt(w0sqm1);
+				d2tsw = (s * s * tsw - w0 * dtsw) / w0sqm1;
 			}
 
-			beta = (onemq * dtsw + sqrt(onemq * onemq * dtsw * dtsw + 4 * q * tsw * d2tsw)) / (2 * d2tsw);
-			gamma = (1 + q) * tsw / (q * tsw + beta * dtsw);
+			w1 = (onemq * dtsw + sqrt(onemq * onemq * dtsw * dtsw + 4 * q * tsw * d2tsw)) / (2 * d2tsw);
+			g = (1 + q) * tsw / (q * tsw + w1 * dtsw);
 
 			h = tdir * absh;
-			step_tsrkc2(n, x, h, yold, yn, fn, m, w, beta, gamma, acoshtds, f, y, vtemp1, vtemp2);
+			step_tsrkc2(n, x, h, yold, yn, fn, m, w0, w1, g, acoshtds, f, y, vtemp1, vtemp2);
 		}
 
 		hmin = 10. * uround * fmax(fabs(x), fabs(x + h));
@@ -673,26 +687,21 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				at = atol[i];
 			}
 			wt = at + rtol * fmax(fabs(y[i]), fabs(yn[i]));
-			if (wt == 0)
-			{
-				return 3;
-			}
 
 			if (method == 0)
 			{
-				est0 = 0.6 * (yn[i] / q - yold[i] / (q * onepq2) - y[i] * (2 + q) / onepq2 + h * vtemp1[i] / onepq);
-				err += (est0 * est0) / (wt * wt);
+				est = 0.6 * (yn[i] / q - yold[i] / (q * onepq2) - y[i] * (2 + q) / onepq2 + h * vtemp1[i] / onepq);
 			}
 			else if (method == 1)
 			{
-				est1 = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
-				err += (est1 * est1) / (wt * wt);
+				est = 0.3333333333333333 * (yn[i] - y[i] + h * vtemp1[i]);
 			}
 			else if (method == 2)
 			{
-				est2 = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
-				err += (est2 * est2) / (wt * wt);
+				est = 0.8 * (yn[i] - y[i]) + 0.4 * h * (fn[i] + vtemp1[i]);
 			}
+
+			err += (est * est) / (wt * wt);
 		}
 		err = sqrt(err / n);
 
@@ -761,11 +770,8 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 
 		abshold = absh;
 		fac = pow(err, -errpow);
-		if (iwork[6] > 1)
-		{
-			temp = pow(errold, errpow) * fac * fac / q;
-			fac = fmin(fac, temp);
-		}
+		temp = pow(errold, errpow) * fac * fac / q;
+		fac = fmin(fac, temp);
 		absh *= fmax(0.1, fmin(0.8 * fac, facmax));
 		absh = fmax(hmin, fmin(hmax, absh));
 		errold = err;
