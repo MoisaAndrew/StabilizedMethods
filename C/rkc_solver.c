@@ -781,7 +781,7 @@ int rkc_solver(const unsigned n, const double x, const double xend, double* y,
 	const double* atol, const double rtol,
 	unsigned iwork[10], double* work, const int method)
 {
-	const double uround = 1e-8;
+	const double uround = 1e-16;
 
 	if (n <= 0 || method < 0 || method > 2)
 	{
