@@ -1,4 +1,4 @@
-//	Version of April 2026
+//	Version of June 2026
 
 
 #include "methods_common.h"
@@ -152,7 +152,6 @@ static void step_rkc(const unsigned n,
 		{
 			y[i] = mu * yjm1[i] + nu * yjm2[i] + (1. - mu - nu) * yn[i] + h * mus * (y[i] - ajm1 * fn[i]);
 		}
-		thj = mu * thjm1 + nu * thjm2 + mus * (1. - ajm1);
 
 		if (j < m)
 		{
@@ -161,6 +160,7 @@ static void step_rkc(const unsigned n,
 			yjm1 = y;
 			y = swap;
 
+			thj = mu * thjm1 + nu * thjm2 + mus * (1. - ajm1);
 			thjm2 = thjm1;
 			thjm1 = thj;
 			bjm2 = bjm1;
@@ -277,7 +277,6 @@ static void step_tsrkc3(const unsigned n,
 		{
 			y2[i] = mu * yjm1[i] + nu * yjm2[i] + (1. - mu - nu) * y1[i] + h * mus * (y2[i] - ajm1 * f1[i]);
 		}
-		thj = mu * thjm1 + nu * thjm2 + mus * (1. - ajm1);
 
 		if (j < m)
 		{
@@ -286,6 +285,7 @@ static void step_tsrkc3(const unsigned n,
 			yjm1 = y2;
 			y2 = swap;
 
+			thj = mu * thjm1 + nu * thjm2 + mus * (1. - ajm1);
 			thjm2 = thjm1;
 			thjm1 = thj;
 			bjm2 = bjm1;
@@ -396,10 +396,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			at = atol[i];
 		}
 		wt = at + rtol * fabs(yn[i]);
-		if (wt == 0.)
-		{
-			return 3;
-		}
+
 		err += (vtemp2[i] - fn[i]) * (vtemp2[i] - fn[i]) / (wt * wt);
 	}
 	err = absh * sqrt(err / n);
@@ -784,7 +781,7 @@ int rkc_solver(const unsigned n, const double x, const double xend, double* y,
 	const double* atol, const double rtol,
 	unsigned iwork[10], double* work, const int method)
 {
-	const double uround = 1e-16;
+	const double uround = 1e-8;
 
 	if (n <= 0 || method < 0 || method > 2)
 	{
