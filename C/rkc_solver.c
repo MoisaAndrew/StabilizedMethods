@@ -185,52 +185,57 @@ static void step_tsrkc2(const unsigned n,
 	const double x1, const double h,
 	const double* y0, const double* y1, const double* f1,
 	const unsigned m,
-	const double w0, const double w1, const double g, const double acoshtds,
+	const double w0, const double w1, const double g,
 	const Fcn f,
 	double* y2, double* yjm1, double* yjm2)
 {
-	double* yswap;
-	double* res = y2;
-	const double hw1 = h * w1;
-	double coshims = 1, coshi = w0, tim1wdtiw;
-	double temp1 = hw1 / w0, temp2, temp3;
-	double ci1 = x1 + temp1, ci2 = x1 + temp1, ci3 = x1;
-	unsigned i, j;
+	unsigned i;
+	double* swap, * res = y2;
 
 	memcpy(yjm2, y1, n * sizeof(double));
-	for (j = 0; j < n; j++)
+	double mus = w1 / w0;
+	for (i = 0; i < n; i++)
 	{
-		yjm1[j] = yjm2[j] + temp1 * f1[j];
+		yjm1[i] = yjm2[i] + h * mus * f1[i];
 	}
+	double thjm2 = 0., thjm1 = mus;
+	double zjm1 = w0, zjm2 = 1.;
 
-	for (i = 2; i <= m; i++)
+	double zj = 2. * w0 * zjm1 - zjm2;
+	double mu, nu, thj, cj;
+	for (unsigned j = 2; j <= m; j++)
 	{
-		coshims = coshi;
-		coshi = cosh(i * acoshtds);
-		tim1wdtiw = coshims / coshi;
-		temp1 = 2 * hw1 * tim1wdtiw;
-		temp2 = 2 * w0 * tim1wdtiw;
-		temp3 = 1 - temp2;
-		f(&n, &ci1, yjm1, y2);
-		ci1 = temp1 + temp2 * ci2 + temp3 * ci3;
-		for (j = 0; j < n; j++)
+		mu = 2. * w0 * zjm1 / zj;
+		nu = -zjm2 / zj;
+		mus = mu * w1 / w0;
+
+		cj = x1 + h * thjm1;
+		f(&n, &cj, yjm1, y2);
+		for (i = 0; i < n; i++)
 		{
-			y2[j] = temp1 * y2[j] + temp2 * yjm1[j] + temp3 * yjm2[j];
+			y2[i] = mu * yjm1[i] + nu * yjm2[i] + h * mus * y2[i];
 		}
 
-		yswap = yjm2;
-		yjm2 = yjm1;
-		yjm1 = y2;
-		y2 = yswap;
+		if (j < m)
+		{
+			swap = yjm2;
+			yjm2 = yjm1;
+			yjm1 = y2;
+			y2 = swap;
 
-		ci3 = ci2;
-		ci2 = ci1;
+			thj = mu * thjm1 + nu * thjm2 + mus;
+			thjm2 = thjm1;
+			thjm1 = thj;
+			zjm2 = zjm1;
+			zjm1 = zj;
+			zj = 2. * w0 * zjm1 - zjm2;
+		}
 	}
 
-	temp3 = 1 - g;
-	for (j = 0; j < n; j++)
+	mu = 1 - g;
+	for (i = 0; i < n; i++)
 	{
-		res[j] = temp3 * y0[j] + g * yjm1[j];
+		res[i] = g * y2[i] + mu * y0[i];
 	}
 }
 
@@ -328,7 +333,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 	const double errpow = method == 1 ? 0.5 : 0.3333333333333333;
 	double hmin = 10. * uround * fmax(fabs(x), hmax);
 	double absh, h, abshold, est, sprad, wt, at, err, errold, fac, temp, ci;
-	double q, onemq, onepq, onepq2, s, s2, w0, w0sq, w0sqm1, dtsw, d2tsw, d3tsw;
+	double q, onemq, onepq, onepq2, s, s2, w0, w0m1, w0sqm1, dtsw, d2tsw, d3tsw;
 	double a, w1, g, acoshtds;
 	unsigned i, m, mold = 0;
 
@@ -427,9 +432,9 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 		}
 		s = (double)m;
 		s2 = s * s;
-		w0 = 1. + 2. / (13. * s2);
-		w0sq = w0 * w0;
-		w0sqm1 = w0sq - 1;
+		w0m1 = 2. / (13. * s2);
+		w0 = 1. + 2. / (13. * s2);;
+		w0sqm1 = w0m1 * (w0m1 + 2.);
 		dtsw = s * sinh(s * acosh(w0)) / sqrt(w0sqm1);
 		d2tsw = (s2 * cosh(s * acosh(w0)) - w0 * dtsw) / w0sqm1;
 		w1 = dtsw / d2tsw;
@@ -540,6 +545,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 
 	const double tsw = method == 0 ? 1.25 : 1.1;
 	const double acosht = acosh(tsw);
+	const double sinhacosht = sinh(acosht);
 
 	while (true)
 	{
@@ -585,9 +591,9 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			{
 				s = (double)m;
 				s2 = s * s;
-				w0 = 1. + 2. / (13. * s2);
-				w0sq = w0 * w0;
-				w0sqm1 = w0sq - 1;
+				w0m1 = 2. / (13. * s2);
+				w0 = 1. + w0m1;
+				w0sqm1 = w0m1 * (w0m1 + 2);
 				dtsw = s * sinh(s * acosh(w0)) / sqrt(w0sqm1);
 				d2tsw = (s2 * cosh(s * acosh(w0)) - w0 * dtsw) / w0sqm1;
 				w1 = dtsw / d2tsw;
@@ -620,12 +626,13 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 				s = (double)m;
 				s2 = s * s;
 				acoshtds = acosht / s;
-				w0 = cosh(acoshtds);
-				w0sq = w0 * w0;
-				w0sqm1 = w0sq - 1;
-				dtsw = s * sinh(acosht) / sqrt(w0sqm1);
+				temp = sinh(0.5 * acoshtds);
+				w0m1 = 2 * temp * temp;
+				w0 = 1 + w0m1;
+				w0sqm1 = w0m1 * (w0m1 + 2);
+				dtsw = s * sinhacosht / sqrt(w0sqm1);
 				d2tsw = (s2 * tsw - w0 * dtsw) / w0sqm1;
-				d3tsw = ((1 + 2 * w0sq + s2 * w0sqm1) * dtsw - 3 * s2 * w0 * tsw) / (w0sqm1 * w0sqm1);
+				d3tsw = ((1 + 2 * w0 * w0 + s2 * w0sqm1) * dtsw - 3 * s2 * w0 * tsw) / (w0sqm1 * w0sqm1);
 			}
 
 			w1 = (onemq * d2tsw + sqrt(onemq * onemq * d2tsw * d2tsw + 4 * q * dtsw * d3tsw)) / (2 * d3tsw);
@@ -653,9 +660,11 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			{
 				s = (double)m;
 				acoshtds = acosht / s;
-				w0 = cosh(acoshtds);
-				w0sqm1 = w0 * w0 - 1;
-				dtsw = s * sinh(acosht) / sqrt(w0sqm1);
+				temp = sinh(0.5 * acoshtds);
+				w0m1 = 2 * temp * temp;
+				w0 = 1 + w0m1;
+				w0sqm1 = w0m1 * (w0m1 + 2);
+				dtsw = s * sinhacosht / sqrt(w0sqm1);
 				d2tsw = (s * s * tsw - w0 * dtsw) / w0sqm1;
 			}
 
@@ -663,7 +672,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 			g = (1 + q) * tsw / (q * tsw + w1 * dtsw);
 
 			h = tdir * absh;
-			step_tsrkc2(n, x, h, yold, yn, fn, m, w0, w1, g, acoshtds, f, y, vtemp1, vtemp2);
+			step_tsrkc2(n, x, h, yold, yn, fn, m, w0, w1, g, f, y, vtemp1, vtemp2);
 		}
 
 		hmin = 10. * uround * fmax(fabs(x), fabs(x + h));
