@@ -1,4 +1,4 @@
-//	Version of June 2026
+//	Version of July 2026
 
 
 #include "methods_common.h"
@@ -325,7 +325,7 @@ static int rkc_core(const unsigned n, double x, const double xend, double* y,
 	double* work, unsigned iwork[10], const int method)
 {
 	bool newspc = true, jacatt = false, last;
-	unsigned mmax = fmax(sqrt(rtol / (10. * uround)), 2);
+	unsigned mmax = fmax(sqrt(rtol / (10. * uround)), method == 0 ? 3 : 2);
 	unsigned nstsig = 0;
 	const double tdir = xend - x > 0 ? 1. : -1.;
 	const double hmax = tdir * (xend - x);

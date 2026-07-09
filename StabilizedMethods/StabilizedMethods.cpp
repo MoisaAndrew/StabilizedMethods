@@ -262,55 +262,55 @@ int main()
 
     
     /*
-    printf("\r\n------------------------------------------rkcf------------------------------------------\r\n");
+    printf("\r\n(*----------------------------------------rkcf----------------------------------------*)\r\n");
 
     run_method_test(*params, RKC_F, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
         fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
     
-    printf("\r\n------------------------------------------rkcc------------------------------------------\r\n");
+    printf("\r\n(*----------------------------------------rkcc----------------------------------------*)\r\n");
 
     run_method_test(*params, RKC_C, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
         fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     
     
-    printf("\r\n-----------------------------------------rock4f-----------------------------------------\r\n");
+    printf("\r\n(*---------------------------------------rock4f---------------------------------------*)\r\n");
 
     run_method_test(*params, ROCK4_F, fromtolp, totolp, tolpstep, y0, y, modelsolution,
         fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     
     /*
-    printf("\r\n-----------------------------------------rock2f-----------------------------------------\r\n");
+    printf("\r\n(*---------------------------------------rock2f---------------------------------------*)\r\n");
 
     run_method_test(*params, ROCK2_F, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
         fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
-    printf("\r\n-----------------------------------------dumka3-----------------------------------------\r\n");
+    printf("\r\n(*---------------------------------------dumka3---------------------------------------*)\r\n");
 
     run_method_test(*params, DUMKA3, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
         fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
     /*
-    printf("\r\n-----------------------------------------tsrkc2-----------------------------------------\r\n");
+    printf("\r\n(*---------------------------------------tsrkc2---------------------------------------*)\r\n");
     
     run_method_test(*params, TSRKC2, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
         fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
     
-    printf("\r\n-----------------------------------------tsrkc3-----------------------------------------\r\n");
+    printf("\r\n(*---------------------------------------tsrkc3---------------------------------------*)\r\n");
     
     run_method_test(*params, TSRKC3, fromtolp, totolp, tolpstep, y0, y, modelsolution,
         fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     
     /*
-    printf("\r\n------------------------------------------mono------------------------------------------\r\n");
+    printf("\r\n(*----------------------------------------mono----------------------------------------*)\r\n");
 
     run_method_test(*params, MONO, fromtolp, totolp, tolpstep, y0, y, modelsolution, 
         fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
     */
     
-    printf("\r\n-----------------------------------------vodpk------------------------------------------\r\n");
+    printf("\r\n(*---------------------------------------vodpk----------------------------------------*)\r\n");
 
     run_method_test(*params, VODPK_F, fromtolp, totolp, tolpstep, y0, y, modelsolution,
         fcn, rho, jac, psol, work, iwork, report, printstats, printreport, reportlength);
